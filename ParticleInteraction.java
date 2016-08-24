@@ -37,6 +37,7 @@ public class ParticleInteraction {
 		frame.setVisible(true);
 		int Black = new Color(0,0,0).getRGB();
 		int White = new Color(255,255,255).getRGB();
+		int Gray = new Color(128,128,128).getRGB();
     	//Set simulation parameters, next 7 lines
     	int particleCount = 2;
     	double startingMass = 5.0;
@@ -47,7 +48,7 @@ public class ParticleInteraction {
     	double deltaTime = 0.001; //timestep in seconds
     	double constantGravity=0.0001; //gravitational constant
     	double initialVel=0.0;
-    	double variationVel=0.1;
+    	double variationVel=0.2;
     	boolean drawTrails=true;
     	
         //Create array of particles and place them in the disk, next 4 lines
@@ -71,8 +72,17 @@ public class ParticleInteraction {
         			}
         		}
         	}
-        	//Wipe screen
-        	if (!drawTrails){
+        	//Wipe screen or gray out trails
+        	if (drawTrails){
+        		for(int i=0; i<particleCount; i++){
+        			int dispX = (int)((particleArray[i].getXPosition()*200)+400);
+					int dispY = (int)((particleArray[i].getYPosition()*200)+400);
+					if ((dispX<800)&&(dispY<800)&&(dispX>0)&&(dispY>0)){
+					displayImage.setRGB(dispX,dispY, Gray);
+					}
+        		}
+        	}
+        	else{
        			for(int r=0;r<800;r++){
 					for(int c=0;c<800;c++){
 						displayImage.setRGB(r,c, Black);
