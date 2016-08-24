@@ -1,0 +1,10 @@
+Add collisions
+  -When 2 particles come close enough to each other, they become one particle.
+  -New particle's mass will be equivalent to the sum of the original particle's masses
+  -New particle's momentum will be equivalent to the sum of the original particle's momentums
+Add visual representation of size
+  -Radius of particle is proportional to its mass
+Add initial disk rotation
+  -When the disk of particles is generated, particles are more likely to have an initial velocity that would result in an overall spinning disk
+Get simulation settings from user, rather than having them pre-defined in the source code
+  -Use the console to ask for settings
