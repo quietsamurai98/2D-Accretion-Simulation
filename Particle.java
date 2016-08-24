@@ -28,16 +28,16 @@ public class Particle {
 		yForce=0.0;
 		mass=0.0;
 	}
-    public Particle(double diskRadius, double diskCenterX, double diskCenterY, double startingMass, double vel) {
+    public Particle(double diskRadius, double diskCenterX, double diskCenterY, double startingMass, double varyMass, double vel, double varyVel) {
     	xPosition=diskCenterX;
 		yPosition=diskCenterY;
 		xAcceleration=0.0;
 		yAcceleration=0.0;
-		xVelocity=(Math.random()*2.0-1.0)*vel;
-		yVelocity=(Math.random()*2.0-1.0)*vel;
+		xVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
+		yVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
 		xForce=0.0;
 		yForce=0.0;
-		mass=startingMass;
+		mass=startingMass+((Math.random()*2.0-1.0)*varyMass);
 		double xOffset=(Math.random()*2.0-1.0)*diskRadius;
 		double yOffset=(Math.random()*2.0-1.0)*diskRadius;
 		while (Math.sqrt(xOffset*xOffset+yOffset*yOffset)>diskRadius){
