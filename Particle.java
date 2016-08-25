@@ -17,6 +17,7 @@ public class Particle {
 	private double xForce;
 	private double yForce;
 	private double mass;
+	private double distToCenter;
 	public Particle() {
     	xPosition=0.0;
 		yPosition=0.0;
@@ -27,25 +28,29 @@ public class Particle {
 		xForce=0.0;
 		yForce=0.0;
 		mass=0.0;
+		distToCenter=0.0;
 	}
-    public Particle(double diskRadius, double diskCenterX, double diskCenterY, double startingMass, double varyMass, double vel, double varyVel) {
+    public Particle(double diskRadius, double diskCenterX, double diskCenterY, double startingMass, double varyMass, double vel, double varyVel, double spin, double varySpin) {
     	xPosition=diskCenterX;
 		yPosition=diskCenterY;
 		xAcceleration=0.0;
 		yAcceleration=0.0;
-		xVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
-		yVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
 		xForce=0.0;
 		yForce=0.0;
 		mass=startingMass+((Math.random()*2.0-1.0)*varyMass);
 		double xOffset=(Math.random()*2.0-1.0)*diskRadius;
 		double yOffset=(Math.random()*2.0-1.0)*diskRadius;
-		while (Math.sqrt(xOffset*xOffset+yOffset*yOffset)>diskRadius){
+		distToCenter=Math.sqrt(xOffset*xOffset+yOffset*yOffset);
+		while (distToCenter>diskRadius){
 			xOffset=Math.random()*diskRadius;
 			yOffset=Math.random()*diskRadius;
+			distToCenter=Math.sqrt(xOffset*xOffset+yOffset*yOffset);
 		}
 		xPosition+=xOffset;
 		yPosition+=yOffset;
+		distToCenter=Math.sqrt(xPosition*xPosition+yPosition*yPosition);
+		xVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+(yPosition/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
+		yVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((0.0-xPosition)/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
     }
     public double getXPosition(){
     	return xPosition;
@@ -101,5 +106,16 @@ public class Particle {
 	public void setMass(double newMass){
     	mass=newMass;
     }
-    
+    public void updateVel(double deltaTime){
+        xVelocity += (xForce*deltaTime)/mass;
+        yVelocity += (yForce*deltaTime)/mass;
+    }
+    public void updatePos(double deltaTime){
+	    xPosition += xVelocity*deltaTime;
+        yPosition += yVelocity*deltaTime;
+    }
+    public void updateForceXY(double angle, double forceTotal){
+    	xForce -= Math.cos(angle)*forceTotal;
+        yForce -= Math.sin(angle)*forceTotal;
+    }
 }
