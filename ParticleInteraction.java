@@ -46,21 +46,22 @@ public class ParticleInteraction {
 		frame.setVisible(true);
 		int Black = new Color(0,0,0).getRGB();
 		int White = new Color(255,255,255).getRGB();
+		int NearWhite = new Color(254,254,254).getRGB();
 		int Gray = new Color(128,128,128).getRGB();
 		
     	//Set simulation parameters
-    	int particleCount = 5;
-    	double startingMass = 5.0;
-    	double variationMass = 4.0;
+    	int particleCount = 3;
+    	double startingMass = 10.0;
+    	double variationMass = 9.0;
     	double xOrigin = 0.0;
     	double yOrigin = 0.0;
-    	double diskRadius = 0.1;
+    	double diskRadius = 0.15;
     	double deltaTime = 0.001; //timestep in seconds
     	double constantGravity=0.001; //gravitational constant
     	double initialVel=0.0;
-    	double variationVel=0.01;
+    	double variationVel=0.001;
     	double initialSpin=0.1;
-    	double variationSpin=0.01;
+    	double variationSpin=0.00;
     	boolean drawTrails=true;
     	
         //Create array of particles and place them in the disk, next 4 lines
@@ -89,7 +90,24 @@ public class ParticleInteraction {
         			int dispX = (int)((particleArray[i].getXPosition()*200)+400);
 					int dispY = (int)((particleArray[i].getYPosition()*200)+400);
 					if ((dispX<800)&&(dispY<800)&&(dispX>0)&&(dispY>0)){
-					displayImage.setRGB(dispX,dispY, Gray);
+						displayImage.setRGB(dispX,dispY, Gray);
+					}
+					for (int j = dispX-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); j <= dispX+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);j++){
+						for (int k = dispY-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); k <= dispY+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);k++){
+							if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
+								int alpha = (displayImage.getRGB(j,k) >> 24) & 0xff;
+								int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
+    							int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
+    							int blue = (displayImage.getRGB(j,k)) & 0xff;
+								if ((red+green+blue)==765){
+									displayImage.setRGB(j,k, Black);
+								}
+								else{
+									if((red+green+blue)==762)
+									displayImage.setRGB(j,k, Gray);
+								}
+							}
+						}
 					}
         		}
         	}
@@ -97,8 +115,18 @@ public class ParticleInteraction {
         		for(int i=0; i<particleCount; i++){
         			int dispX = (int)((particleArray[i].getXPosition()*200)+400);
 					int dispY = (int)((particleArray[i].getYPosition()*200)+400);
-					if ((dispX<800)&&(dispY<800)&&(dispX>0)&&(dispY>0)){
-					displayImage.setRGB(dispX,dispY, Black);
+					for (int j = dispX-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); j <= dispX+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);j++){
+						for (int k = dispY-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); k <= dispY+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);k++){
+							if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
+								int alpha = (displayImage.getRGB(j,k) >> 24) & 0xff;
+								int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
+    							int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
+    							int blue = (displayImage.getRGB(j,k)) & 0xff;
+								if ((red+green+blue)==765){
+									displayImage.setRGB(j,k, Black);
+								}
+							}
+						}
 					}
         		}
        			//for(int r=0;r<800;r++){
@@ -114,10 +142,24 @@ public class ParticleInteraction {
         		
         		//Draw bodies
         		int dispX = (int)((particleArray[i].getXPosition()*200)+400);
-				int dispY = (int)((particleArray[i].getYPosition()*200)+400);
-				if ((dispX<800)&&(dispY<800)&&(dispX>0)&&(dispY>0)){
-					displayImage.setRGB(dispX,dispY, White);
-				}
+					int dispY = (int)((particleArray[i].getYPosition()*200)+400);
+					for (int j = dispX-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); j <= dispX+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);j++){
+						for (int k = dispY-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); k <= dispY+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);k++){
+							if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
+								int alpha = (displayImage.getRGB(j,k) >> 24) & 0xff;
+								int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
+    							int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
+    							int blue = (displayImage.getRGB(j,k)) & 0xff;
+								if ((red+green+blue)==0){
+									displayImage.setRGB(j,k, White);
+								}
+								else{
+									if((red+green+blue)==384)
+									displayImage.setRGB(j,k, NearWhite);
+								}
+							}
+						}
+					}
        		}
 			try {
    					Thread.sleep(1);
@@ -125,6 +167,7 @@ public class ParticleInteraction {
    					System.out.println(e);
    				}
    			frame.repaint();
+   			//System.out.println(particleArray[0].getXVelocity()+","+particleArray[0].getYVelocity());
         }
     }
 }
