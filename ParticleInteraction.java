@@ -63,7 +63,7 @@ public class ParticleInteraction {
     	double initialSpin=0.2;
     	double variationSpin=0.00;
     	double centralParticleMass = 100.0;
-    	boolean drawTrails=true;
+    	boolean drawTrails=false;
     	boolean centralParticle=true;
     	
         //Create array of particles and place them in the disk, next 12 lines
@@ -144,8 +144,9 @@ public class ParticleInteraction {
         		for(int i=0; i<particleCount; i++){
         			int dispX = (int)((particleArray[i].getXPosition()*200)+400);
 					int dispY = (int)((particleArray[i].getYPosition()*200)+400);
-					for (int j = dispX-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); j <= dispX+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);j++){
-						for (int k = dispY-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); k <= dispY+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);k++){
+					int radius = (int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);
+					for (int j = dispX-radius-5; j <= dispX+radius+5;j++){
+						for (int k = dispY-radius-5; k <= dispY+radius+5;k++){
 							if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
 								int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
     							int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
