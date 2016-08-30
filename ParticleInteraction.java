@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.util.Scanner;
 public class ParticleInteraction {
         
     /**
@@ -66,6 +67,49 @@ public class ParticleInteraction {
     	boolean drawTrails=false;
     	boolean centralParticle=true;
     	
+    	
+    	Scanner kb = new Scanner(System.in);
+    	System.out.print("Particle Count (default "+particleCount+"):");
+    	particleCount = kb.nextInt();
+    	System.out.print("Starting mass (default "+startingMass+"):");
+    	startingMass = kb.nextDouble();
+    	System.out.print("Variation mass (default "+variationMass+"):");
+    	variationMass = kb.nextDouble();
+    	System.out.print("X origin (default "+xOrigin+"):");
+    	xOrigin = kb.nextDouble();
+    	System.out.print("Y origin (default "+yOrigin+"):");
+    	yOrigin = kb.nextDouble();
+    	System.out.print("Initial disk radius "+diskRadius+":");
+    	diskRadius = kb.nextDouble();
+    	System.out.print("Time step (default "+deltaTime+"):");
+    	deltaTime = kb.nextDouble();
+    	System.out.print("Gravitational constant (default "+constantGravity+"):");
+    	constantGravity = kb.nextDouble();
+    	System.out.print("Initial velocity (default "+initialVel+"):");
+    	initialVel = kb.nextDouble();
+    	System.out.print("Variation velocity (default "+variationVel+"):");
+    	variationVel = kb.nextDouble();
+    	System.out.print("Initial disk rotation (default "+initialSpin+"):");
+    	initialSpin = kb.nextDouble();
+    	System.out.print("Variation disk rotation (default "+variationSpin+"):");
+    	variationSpin = kb.nextDouble();
+    	
+    	System.out.print("Draw trails (Y//N):");
+    	if (kb.next().equalsIgnoreCase("Y")){
+    		drawTrails = true;
+    	} else {
+    		drawTrails = false;
+    	}
+    	
+    	System.out.print("Central particle (Y//N):");
+    	if (kb.next().equalsIgnoreCase("Y")){
+    		centralParticle = true;
+    		System.out.print("Central particle mass (default "+centralParticleMass+"):");
+    		centralParticleMass = kb.nextDouble();
+    	} else {
+    		centralParticle = false;
+    		centralParticleMass = 0.0;
+    	}
         //Create array of particles and place them in the disk, next 12 lines
         Particle[] particleArray = new Particle[particleCount];
         if (centralParticle){
