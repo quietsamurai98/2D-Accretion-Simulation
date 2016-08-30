@@ -38,6 +38,8 @@ public class Particle {
 		xForce=0.0;
 		yForce=0.0;
 		mass=startingMass+((Math.random()*2.0-1.0)*varyMass);
+		if (!(diskRadius==0)){
+		
 		double xOffset=(Math.random()*2.0-1.0)*diskRadius;
 		double yOffset=(Math.random()*2.0-1.0)*diskRadius;
 		distToCenter=Math.sqrt(xOffset*xOffset+yOffset*yOffset);
@@ -49,8 +51,9 @@ public class Particle {
 		xPosition+=xOffset;
 		yPosition+=yOffset;
 		distToCenter=Math.sqrt(xPosition*xPosition+yPosition*yPosition);
-		xVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+(yPosition/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
-		yVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((0.0-xPosition)/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
+		xVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+(yPosition/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin))*Math.sqrt(1.0/distToCenter);
+		yVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((0.0-xPosition)/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin))*Math.sqrt(1.0/distToCenter);
+		}
     }
     public double getXPosition(){
     	return xPosition;

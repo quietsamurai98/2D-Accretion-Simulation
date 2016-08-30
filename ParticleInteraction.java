@@ -47,27 +47,37 @@ public class ParticleInteraction {
 		int Black = new Color(0,0,0).getRGB();
 		int White = new Color(255,255,255).getRGB();
 		int NearWhite = new Color(254,254,254).getRGB();
-		int Gray = new Color(128,128,128).getRGB();
+		int Gray = new Color(64,64,64).getRGB();
 		
     	//Set simulation parameters
-    	int particleCount = 3;
+    	int particleCount = 11;
     	double startingMass = 10.0;
-    	double variationMass = 9.0;
+    	double variationMass = 9.9;
     	double xOrigin = 0.0;
     	double yOrigin = 0.0;
-    	double diskRadius = 0.15;
+    	double diskRadius = 2.0;
     	double deltaTime = 0.001; //timestep in seconds
     	double constantGravity=0.001; //gravitational constant
     	double initialVel=0.0;
-    	double variationVel=0.001;
-    	double initialSpin=0.1;
+    	double variationVel=0.000;
+    	double initialSpin=0.3;
     	double variationSpin=0.00;
+    	double centralParticleMass = 100.0;
     	boolean drawTrails=true;
+    	boolean centralParticle=true;
     	
-        //Create array of particles and place them in the disk, next 4 lines
+        //Create array of particles and place them in the disk, next 12 lines
         Particle[] particleArray = new Particle[particleCount];
-        for(int i=0; i<particleCount; i++){
-        	particleArray[i]=new Particle(diskRadius,xOrigin,yOrigin,startingMass,variationMass,initialVel,variationVel,initialSpin,variationSpin);
+        if (centralParticle){
+        	particleArray[0]=new Particle(0,xOrigin,yOrigin,centralParticleMass,0.0*variationMass,0.0*initialVel,0.0*variationVel,0.0*initialSpin,0.0*variationSpin);
+        	for(int i=1; i<particleCount; i++){
+        		particleArray[i]=new Particle(diskRadius,xOrigin,yOrigin,startingMass,variationMass,initialVel,variationVel,initialSpin,variationSpin);
+        	}
+        }
+        else{
+        	for(int i=0; i<particleCount; i++){
+        		particleArray[i]=new Particle(diskRadius,xOrigin,yOrigin,startingMass,variationMass,initialVel,variationVel,initialSpin,variationSpin);
+        	}
         }
         
         
@@ -154,7 +164,7 @@ public class ParticleInteraction {
 									displayImage.setRGB(j,k, White);
 								}
 								else{
-									if((red+green+blue)==384)
+									if((red+green+blue)==192)
 									displayImage.setRGB(j,k, NearWhite);
 								}
 							}
