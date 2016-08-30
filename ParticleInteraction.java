@@ -50,17 +50,17 @@ public class ParticleInteraction {
 		int Gray = new Color(64,64,64).getRGB();
 		
     	//Set simulation parameters
-    	int particleCount = 11;
+    	int particleCount = 10;
     	double startingMass = 10.0;
     	double variationMass = 9.9;
     	double xOrigin = 0.0;
     	double yOrigin = 0.0;
-    	double diskRadius = 2.0;
+    	double diskRadius = 1.5;
     	double deltaTime = 0.001; //timestep in seconds
     	double constantGravity=0.001; //gravitational constant
     	double initialVel=0.0;
     	double variationVel=0.000;
-    	double initialSpin=0.3;
+    	double initialSpin=0.2;
     	double variationSpin=0.00;
     	double centralParticleMass = 100.0;
     	boolean drawTrails=true;
@@ -80,8 +80,27 @@ public class ParticleInteraction {
         	}
         }
         
-        
+        boolean collisionOccurred = false;
         while(true){
+        	for(int i=0; i<particleCount; i++){
+        		for(int j=0; j<particleCount; j++){
+        			if(i!=j){
+        				int minDist=(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2)+(int)((Math.sqrt(particleArray[j].getMass())+0.5)/2);
+        				if (Math.sqrt(Math.pow((int)((particleArray[i].getXPosition()*200)+400)-(int)((particleArray[j].getXPosition()*200)+400),2)+Math.pow((int)((particleArray[i].getYPosition()*200)+400)-(int)((particleArray[j].getYPosition()*200)+400),2))<=minDist){
+      		  				particleArray[i].setXVelocity(((particleArray[i].getMass()*particleArray[i].getXVelocity())+(particleArray[j].getMass()*particleArray[j].getXVelocity()))/(particleArray[i].getMass()+particleArray[j].getMass()));
+        					particleArray[i].setYVelocity(((particleArray[i].getMass()*particleArray[i].getYVelocity())+(particleArray[j].getMass()*particleArray[j].getYVelocity()))/(particleArray[i].getMass()+particleArray[j].getMass()));
+        					particleArray[i].setXPosition(((particleArray[i].getMass()*particleArray[i].getXPosition())+(particleArray[j].getMass()*particleArray[j].getXPosition()))/(particleArray[i].getMass()+particleArray[j].getMass()));
+        					particleArray[i].setYPosition(((particleArray[i].getMass()*particleArray[i].getYPosition())+(particleArray[j].getMass()*particleArray[j].getYPosition()))/(particleArray[i].getMass()+particleArray[j].getMass()));
+        					particleArray[i].setMass(particleArray[i].getMass()+particleArray[j].getMass());
+        					particleArray[j].setXPosition(1000000.0*(Math.random()+1.0));
+        					particleArray[j].setYPosition(1000000.0*(Math.random()+1.0));
+        					particleArray[j].setMass(0.0000000000001);
+        					collisionOccurred = true;
+        				}
+        			}
+        		}
+        	}
+        	
         	//Calculate total force on particle, next 10 lines
         	for(int i=0; i<particleCount; i++){
         		particleArray[i].setXForce(0.0);
@@ -102,10 +121,10 @@ public class ParticleInteraction {
 					if ((dispX<800)&&(dispY<800)&&(dispX>0)&&(dispY>0)){
 						displayImage.setRGB(dispX,dispY, Gray);
 					}
-					for (int j = dispX-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); j <= dispX+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);j++){
-						for (int k = dispY-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); k <= dispY+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);k++){
+					int radius = (int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);
+					for (int j = dispX-radius-5; j <= dispX+radius+5;j++){
+						for (int k = dispY-radius-5; k <= dispY+radius+5;k++){
 							if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
-								int alpha = (displayImage.getRGB(j,k) >> 24) & 0xff;
 								int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
     							int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
     							int blue = (displayImage.getRGB(j,k)) & 0xff;
@@ -128,7 +147,6 @@ public class ParticleInteraction {
 					for (int j = dispX-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); j <= dispX+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);j++){
 						for (int k = dispY-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); k <= dispY+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);k++){
 							if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
-								int alpha = (displayImage.getRGB(j,k) >> 24) & 0xff;
 								int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
     							int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
     							int blue = (displayImage.getRGB(j,k)) & 0xff;
@@ -152,30 +170,29 @@ public class ParticleInteraction {
         		
         		//Draw bodies
         		int dispX = (int)((particleArray[i].getXPosition()*200)+400);
-					int dispY = (int)((particleArray[i].getYPosition()*200)+400);
-					for (int j = dispX-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); j <= dispX+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);j++){
-						for (int k = dispY-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); k <= dispY+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);k++){
-							if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
-								int alpha = (displayImage.getRGB(j,k) >> 24) & 0xff;
-								int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
-    							int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
-    							int blue = (displayImage.getRGB(j,k)) & 0xff;
-								if ((red+green+blue)==0){
-									displayImage.setRGB(j,k, White);
-								}
-								else{
-									if((red+green+blue)==192)
-									displayImage.setRGB(j,k, NearWhite);
-								}
+				int dispY = (int)((particleArray[i].getYPosition()*200)+400);
+				for (int j = dispX-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); j <= dispX+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);j++){
+					for (int k = dispY-(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2); k <= dispY+(int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);k++){
+						if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
+							int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
+    						int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
+    						int blue = (displayImage.getRGB(j,k)) & 0xff;
+							if ((red+green+blue)==0){
+								displayImage.setRGB(j,k, White);
+							}
+							else{
+								if((red+green+blue)==192)
+								displayImage.setRGB(j,k, NearWhite);
 							}
 						}
 					}
+				}
        		}
 			try {
-   					Thread.sleep(1);
-   				} catch (Exception e) {
-   					System.out.println(e);
-   				}
+   				Thread.sleep(1);
+   			} catch (Exception e) {
+   				System.out.println(e);
+   			}
    			frame.repaint();
    			//System.out.println(particleArray[0].getXVelocity()+","+particleArray[0].getYVelocity());
         }
