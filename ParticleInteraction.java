@@ -78,7 +78,7 @@ public class ParticleInteraction {
     	double variationMass = 0.9;
     	double xOrigin = 0.0;
     	double yOrigin = 0.0;
-    	double diskRadius = 2.0;
+    	double diskRadius = 1.5;
     	double deltaTime = 0.001; //timestep in seconds
     	double constantGravity=0.001; //gravitational constant
     	double initialVel=0.0;
@@ -92,13 +92,16 @@ public class ParticleInteraction {
     	boolean maintainParticles=true;
     	double collisionDistFactor=1.0;
     	boolean focusBary=true;
-    	boolean drawBary=false;
+    	boolean drawBary=true;
     	int outOfBounds = 100;
+    	double maxMass = 10000.0;
     	Scanner kb = new Scanner(System.in);
     	 System.out.print("Use default settings? (Y/N):");
     	if (kb.next().equalsIgnoreCase("N")){
 	    	System.out.print("Particle Count (default "+particleCount+"):");
 	    	particleCount = kb.nextInt();
+	    	System.out.print("Maximum system mass (default "+maxMass+"):");
+	    	maxMass = kb.nextDouble();
 	    	System.out.print("Starting mass (default "+initialMass+"):");
 	    	initialMass = kb.nextDouble();
 	    	System.out.print("Variation mass (default "+variationMass+"):");
@@ -222,7 +225,15 @@ public class ParticleInteraction {
 	        						baryX /= baryMass;
 	        						baryY /= baryMass;
 	        						
-	        						particleArray[j]=new Particle(diskRadius,baryX,baryY,initialMass,variationMass,initialVel,variationVel,initialSpinFactor,variationSpin,constantGravity,baryMass/2.0);
+	        						if (baryMass<maxMass){
+	        							particleArray[j]=new Particle(diskRadius,baryX,baryY,initialMass,variationMass,initialVel,variationVel,initialSpinFactor,variationSpin,constantGravity,baryMass/2.0);
+	        						}else{
+	        							particleArray[j].setXPosition(1000000.0*(Math.random()+1.0));
+	        							particleArray[j].setYPosition(1000000.0*(Math.random()+1.0));
+	        							particleArray[j].setMass(0.0000000000001);
+	        						}
+	        						System.out.println("System mass: "+baryMass);
+	        						//particleArray[j]=new Particle(diskRadius,baryX,baryY,initialMass,variationMass,initialVel,variationVel,initialSpinFactor,variationSpin,constantGravity,baryMass/2.0);
 	        						//wipeScreen=true;
 	        					}else{
 	        						particleArray[j].setXPosition(1000000.0*(Math.random()+1.0));
@@ -265,11 +276,16 @@ public class ParticleInteraction {
 					baryY /= baryMass;
         		}
         		if(drawBary){
-        			int j = (int)(baryX*200.0)+400;
-        			int k = (int)(baryY*200.0)+400;
-        			if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
-        				displayImage.setRGB(j,k, Red);
+        			if(focusBary){
+        				displayImage.setRGB(400,400,Red);	
+        			}else{
+        				int j = (int)(baryX*200.0)+400;
+        				int k = (int)(baryY*200.0)+400;
+        				if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
+        					displayImage.setRGB(j,k, Red);
+        				}
         			}
+        			
         		}
 	    		if(!focusBary){
 	    			baryX=0.0;
@@ -318,10 +334,14 @@ public class ParticleInteraction {
 					baryY /= baryMass;
         		}
         		if(drawBary){
-        			int j = (int)(baryX*200.0)+400;
-        			int k = (int)(baryY*200.0)+400;
-        			if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
-        				displayImage.setRGB(j,k, Red);
+        			if(focusBary){
+        				displayImage.setRGB(400,400,Red);	
+        			}else{
+        				int j = (int)(baryX*200.0)+400;
+        				int k = (int)(baryY*200.0)+400;
+        				if ((j<800)&&(k<800)&&(j>0)&&(k>0)){
+        					displayImage.setRGB(j,k, Red);
+        				}
         			}
         		}
 	    		if(!focusBary){
@@ -410,8 +430,13 @@ public class ParticleInteraction {
 	        					}
 	        					baryX /= baryMass;
 	        					baryY /= baryMass;
-	        					
-	        					particleArray[i]=new Particle(diskRadius,baryX,baryY,initialMass,variationMass,initialVel,variationVel,initialSpinFactor,variationSpin,constantGravity,baryMass/2.0);
+	        					if (baryMass<maxMass){
+        							particleArray[i]=new Particle(diskRadius,baryX,baryY,initialMass,variationMass,initialVel,variationVel,initialSpinFactor,variationSpin,constantGravity,baryMass/2.0);
+        						}else{
+        							particleArray[i].setXPosition(1000000.0*(Math.random()+1.0));
+        							particleArray[i].setYPosition(1000000.0*(Math.random()+1.0));
+        							particleArray[i].setMass(0.0000000000001);
+        						}
 	        					//wipeScreen=true;
         					}
 						}
@@ -419,7 +444,7 @@ public class ParticleInteraction {
 				}
        		}
 			try {
-   				Thread.sleep(1);
+   				Thread.sleep(0);
    			} catch (Exception e) {
    				System.out.println(e);
    			}
