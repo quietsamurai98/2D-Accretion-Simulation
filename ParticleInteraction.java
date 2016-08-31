@@ -85,7 +85,7 @@ public class ParticleInteraction {
     	double variationVel=0.000;
     	double initialSpinFactor=1.0;
     	double variationSpin=0.00;
-    	double centralParticleMass = 1000.0;
+    	double centralParticleMass = 100.0;
     	boolean drawTrails=false;
     	boolean centralParticle=true;
     	boolean enableCollisions=true;
