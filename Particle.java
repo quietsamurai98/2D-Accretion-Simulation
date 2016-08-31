@@ -30,29 +30,29 @@ public class Particle {
 		mass=0.0;
 		distToCenter=0.0;
 	}
-    public Particle(double diskRadius, double diskCenterX, double diskCenterY, double startingMass, double varyMass, double vel, double varyVel, double spin, double varySpin) {
+    public Particle(double diskRadius, double diskCenterX, double diskCenterY, double initialMass, double varyMass, double vel, double varyVel, double spinFactor, double varySpin, double constantGravity, double baryMass) {
     	xPosition=diskCenterX;
 		yPosition=diskCenterY;
 		xAcceleration=0.0;
 		yAcceleration=0.0;
 		xForce=0.0;
 		yForce=0.0;
-		mass=startingMass+((Math.random()*2.0-1.0)*varyMass);
-		if (!(diskRadius==0)){
-		
-		double xOffset=(Math.random()*2.0-1.0)*diskRadius;
-		double yOffset=(Math.random()*2.0-1.0)*diskRadius;
-		distToCenter=Math.sqrt(xOffset*xOffset+yOffset*yOffset);
-		while (distToCenter>diskRadius){
-			xOffset=Math.random()*diskRadius;
-			yOffset=Math.random()*diskRadius;
-			distToCenter=Math.sqrt(xOffset*xOffset+yOffset*yOffset);
-		}
-		xPosition+=xOffset;
-		yPosition+=yOffset;
-		distToCenter=Math.sqrt(xPosition*xPosition+yPosition*yPosition);
-		xVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+(yPosition/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin))*Math.sqrt(1.0/distToCenter);
-		yVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((0.0-xPosition)/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin))*Math.sqrt(1.0/distToCenter);
+		mass=initialMass+((Math.random()*2.0-1.0)*varyMass);
+		if (!(diskRadius==0.0)){
+			double xOffset=(Math.random()*2.0-1.0)*diskRadius;
+			double yOffset=(Math.random()*2.0-1.0)*diskRadius;
+			distToCenter=Math.sqrt((xPosition-diskCenterX+xOffset)*(xPosition-diskCenterX+xOffset)+(yPosition-diskCenterY+yOffset)*(yPosition-diskCenterY+yOffset));
+			while (distToCenter>diskRadius){
+				xOffset=(Math.random()*2.0-1.0)*diskRadius;
+				yOffset=(Math.random()*2.0-1.0)*diskRadius;
+				distToCenter=Math.sqrt((xPosition-diskCenterX+xOffset)*(xPosition-diskCenterX+xOffset)+(yPosition-diskCenterY+yOffset)*(yPosition-diskCenterY+yOffset));
+			}
+			xPosition+=xOffset;
+			yPosition+=yOffset;
+			distToCenter=Math.sqrt((xPosition-diskCenterX)*(xPosition-diskCenterX)+(yPosition-diskCenterY)*(yPosition-diskCenterY));
+			double spin=Math.sqrt((constantGravity*baryMass)/distToCenter)*spinFactor;
+			xVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((yPosition-diskCenterY)/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
+			yVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((0.0-(xPosition-diskCenterX))/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
 		}
     }
     public double getXPosition(){
