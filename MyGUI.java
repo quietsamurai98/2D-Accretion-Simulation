@@ -89,14 +89,14 @@ public class MyGUI {
     public void createUIComponents(){
     	//Add all the UI Components
     	SpinnerNumberModel model01 = new SpinnerNumberModel( spinner01Value,  1,  Integer.MAX_VALUE,  1);
-    	SpinnerNumberModel model02 = new SpinnerNumberModel( spinner02Value,  0,  Double.MAX_VALUE,  0.1);
-   		SpinnerNumberModel model03 = new SpinnerNumberModel( spinner03Value,  0,  Double.MAX_VALUE,  0.1);
-   		SpinnerNumberModel model04 = new SpinnerNumberModel( spinner04Value,  0,  Double.MAX_VALUE,  0.1);
-   		SpinnerNumberModel model05 = new SpinnerNumberModel( spinner05Value,  0,  Double.MAX_VALUE,  0.001);
-   		SpinnerNumberModel model06 = new SpinnerNumberModel( spinner06Value,  -(Double.MAX_VALUE/2),  Double.MAX_VALUE,  0.001);
-   		SpinnerNumberModel model07 = new SpinnerNumberModel( spinner07Value,  -Double.MAX_VALUE,  Double.MAX_VALUE,  0.001);
-   		SpinnerNumberModel model08 = new SpinnerNumberModel( spinner08Value,  -Double.MAX_VALUE,  Double.MAX_VALUE,  0.1);
-   		SpinnerNumberModel model09 = new SpinnerNumberModel( spinner09Value,  -Double.MAX_VALUE,  Double.MAX_VALUE,  0.1);
+    	SpinnerNumberModel model02 = new SpinnerNumberModel( spinner02Value,  0,  Double.MAX_VALUE,  0.01);
+   		SpinnerNumberModel model03 = new SpinnerNumberModel( spinner03Value,  0,  Double.MAX_VALUE,  0.01);
+   		SpinnerNumberModel model04 = new SpinnerNumberModel( spinner04Value,  0,  Double.MAX_VALUE,  0.01);
+   		SpinnerNumberModel model05 = new SpinnerNumberModel( spinner05Value,  0,  Double.MAX_VALUE,  0.0001);
+   		SpinnerNumberModel model06 = new SpinnerNumberModel( spinner06Value,  -(Double.MAX_VALUE/2),  Double.MAX_VALUE,  0.0001);
+   		SpinnerNumberModel model07 = new SpinnerNumberModel( spinner07Value,  -Double.MAX_VALUE,  Double.MAX_VALUE,  0.0001);
+   		SpinnerNumberModel model08 = new SpinnerNumberModel( spinner08Value,  -Double.MAX_VALUE,  Double.MAX_VALUE,  0.01);
+   		SpinnerNumberModel model09 = new SpinnerNumberModel( spinner09Value,  -Double.MAX_VALUE,  Double.MAX_VALUE,  0.01);
     	
     	JLabel label01 = new JLabel("Partcile Count");
     	mainPanel.add(label01);
@@ -107,6 +107,7 @@ public class MyGUI {
             	spinner01Value=(Integer)(((JSpinner)e.getSource()).getValue());
         	}
       	});
+
       	mainPanel.add(spinner01);
     	
     	JLabel label02 = new JLabel("Initial Mass");
@@ -151,6 +152,7 @@ public class MyGUI {
             	spinner05Value=(Double)(((JSpinner)e.getSource()).getValue());
         	}
       	});
+      	spinner05.setEditor(new JSpinner.NumberEditor(spinner05, "0.0000"));
       	mainPanel.add(spinner05);
     	
     	JLabel label06 = new JLabel("Gravitational Constant");
@@ -162,6 +164,7 @@ public class MyGUI {
             	spinner06Value=(Double)(((JSpinner)e.getSource()).getValue());
         	}
       	});
+      	spinner06.setEditor(new JSpinner.NumberEditor(spinner06, "0.0000"));
       	mainPanel.add(spinner06);
     	
     	JLabel label07 = new JLabel("Random Initial Velocity");
@@ -173,6 +176,7 @@ public class MyGUI {
             	spinner07Value=(Double)(((JSpinner)e.getSource()).getValue());
         	}
       	});
+      	spinner07.setEditor(new JSpinner.NumberEditor(spinner07, "0.0000"));
       	mainPanel.add(spinner07);
     	
     	JLabel label08 = new JLabel("Initial Disk Rotation");

@@ -18,6 +18,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.util.Scanner;
+import java.awt.Graphics2D; 
 public class ParticleInteraction {
         
     /**
@@ -51,7 +52,14 @@ public class ParticleInteraction {
 		int Gray = new Color(64,64,64).getRGB();
 		int Red = new Color(255,0,0).getRGB();
 		int PinkWhite = new Color(255,254,254).getRGB();
+		Graphics2D    graphics = displayImage.createGraphics();
+
 		
+		long startNano=0;
+	    long elapsedNano=0;
+	    
+	    
+	        	
 		//Create GUI
 		MyGUI testGUI = new MyGUI();
         testGUI.createUIComponents();
@@ -101,6 +109,7 @@ public class ParticleInteraction {
     	boolean drawBary=false;
     	int outOfBounds = 1000;
     	double maxMass = 10000.0;
+    	int fpsCap=120;
     	while (true){
     		particleCount = testGUI.getSpinner01Value(); //System.out.println(particleCount);
 	    	initialMass = testGUI.getSpinner02Value(); //System.out.println(initialMass);
@@ -111,6 +120,7 @@ public class ParticleInteraction {
 	    	variationVel=testGUI.getSpinner07Value(); //System.out.println(variationVel);
 	    	initialSpinFactor=testGUI.getSpinner08Value(); //System.out.println(initialSpinFactor);
 	    	centralParticleMass = testGUI.getSpinner09Value(); //System.out.println(centralParticleMass);
+//   	    fpsCap=60;
 //	    	drawTrails=false;
 //	    	centralParticle=true;
 //	    	enableCollisions=true;
@@ -120,7 +130,10 @@ public class ParticleInteraction {
 //	    	drawBary=false;
 //	    	outOfBounds = 1000;
 //	    	maxMass = 10000.0;
-    		
+
+
+			long fpsNano=(1000000000/fpsCap);
+//    		long fpsNano=16666666;
     		
     		
     		
@@ -145,7 +158,9 @@ public class ParticleInteraction {
 	        double baryMass=0.0;
 	        boolean wipeScreen=false;
 	        int frameCount = 0;
+	        startNano=System.nanoTime();
 	        while(!testGUI.getRestartBool()){
+	        	elapsedNano=0;
 	        	if (enableCollisions){
 		        	for(int i=0; i<particleCount; i++){
 		        		for(int j=0; j<particleCount; j++){
@@ -173,6 +188,7 @@ public class ParticleInteraction {
 		        						
 		        						if (baryMass<maxMass){
 		        							particleArray[j]=new Particle(diskRadius,baryX,baryY,initialMass,variationMass,initialVel,variationVel,initialSpinFactor,variationSpin,constantGravity,baryMass/2.0);
+		        							wipeScreen=focusBary;
 		        						}else{
 		        							particleArray[j].setXPosition(1000000.0*(Math.random()+1.0));
 		        							particleArray[j].setYPosition(1000000.0*(Math.random()+1.0));
@@ -180,7 +196,7 @@ public class ParticleInteraction {
 		        						}
 		        						//System.out.println("System mass: "+baryMass);
 		        						//particleArray[j]=new Particle(diskRadius,baryX,baryY,initialMass,variationMass,initialVel,variationVel,initialSpinFactor,variationSpin,constantGravity,baryMass/2.0);
-		        						//wipeScreen=true;
+		        						
 		        					}else{
 		        						particleArray[j].setXPosition(1000000.0*(Math.random()+1.0));
 		        						particleArray[j].setYPosition(1000000.0*(Math.random()+1.0));
@@ -380,40 +396,48 @@ public class ParticleInteraction {
 		        					baryY /= baryMass;
 		        					if (baryMass<maxMass){
 	        							particleArray[i]=new Particle(diskRadius,baryX,baryY,initialMass,variationMass,initialVel,variationVel,initialSpinFactor,variationSpin,constantGravity,baryMass/2.0);
+	        							
 	        						}else{
 	        							particleArray[i].setXPosition(1000000.0*(Math.random()+1.0));
 	        							particleArray[i].setYPosition(1000000.0*(Math.random()+1.0));
 	        							particleArray[i].setMass(0.0000000000001);
 	        						}
-		        					//wipeScreen=true;
+		        					wipeScreen=true;
 	        					}
 							}
 						}
 					}
 	       		}
-				try {
-	   				Thread.sleep(2);
-	   			} catch (Exception e) {
-	   				System.out.println(e);
-	   			}
-	   			//wipeScreen=false;
-	//   			if (wipeScreen){
-	//	   			for(int r=0;r<800;r++){
-	//					for(int c=0;c<800;c++){
-	//						displayImage.setRGB(r,c, Black);
-	//					}
-	//				}
-	//   			}
+	       		
+//				try {
+//	   				Thread.sleep(16,666666);
+//	   			} catch (Exception e) {
+//	   				System.out.println(e);
+//	   			}
+				elapsedNano = System.nanoTime()-startNano;
+				if (elapsedNano<fpsNano){
+					long milli = (fpsNano-elapsedNano)/1000000;
+					int nano = (int)((fpsNano-elapsedNano)%1000000);
+		   			try {
+		   				Thread.sleep(milli,nano);
+		   			} catch (Exception e) {
+		   				System.out.println(e);
+		   			}
+				}
+				startNano=System.nanoTime();
 	   			frame.repaint();
-	   			//wipeScreen=false;
+	   			
+	   			if (wipeScreen){
+		   			graphics.setPaint ( new Color(0,0,0) );
+					graphics.fillRect ( 0, 0, displayImage.getWidth(), displayImage.getHeight() );
+	   			}
+	   			
+	   			wipeScreen=false;
 	   			//System.out.println(++frameCount+"  og");
 	        }
 	    	testGUI.setRestartBool(false);
-	    	for(int r=0;r<800;r++){
-				for(int c=0;c<800;c++){
-					displayImage.setRGB(r,c, Black);
-				}
-			}
+	    	graphics.setPaint ( new Color(0,0,0) );
+			graphics.fillRect ( 0, 0, displayImage.getWidth(), displayImage.getHeight() );
     	
     	//Particle[] particleArray = new Particle[particleCount];
     	}
