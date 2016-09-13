@@ -35,7 +35,6 @@ public class SettingsGUI {
 	private boolean updateBool = false;
 	
     public SettingsGUI() {
-    	prepareGUI();
     }
     public boolean getRestartBool(){
    		return restartBool;
@@ -70,7 +69,7 @@ public class SettingsGUI {
    	public void setRestartBool(boolean inputBoolean){
    		restartBool=inputBoolean;
    	}
-    private void prepareGUI(){
+    public void prepareGUI(){
     	mainFrame = new JFrame("Simulation Settings");
     	mainFrame.setSize(500,400);
     	

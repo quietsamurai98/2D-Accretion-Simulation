@@ -25,6 +25,7 @@ public class ParticleInteraction {
      * Creates a new instance of <code>ParticleInteraction</code>.
      */
     Particle[] particleArray = new Particle[0];
+    SettingsGUI settings = new SettingsGUI();
     int particleCount;
 	double initialMass;
     double variationMass;
@@ -36,6 +37,13 @@ public class ParticleInteraction {
    	double variationSpin;
    	double centralParticleMass;
    	boolean centralParticle;
+   	BufferedImage displayImage;
+   	Graphics2D displayGraphics;
+   	int whiteInt;
+   	int blackInt;
+   	double centerX;
+   	double centerY;
+   	JFrame frame;
     public ParticleInteraction() {
 
     }
@@ -43,11 +51,15 @@ public class ParticleInteraction {
     /**
      * @param args the command line arguments
      */
-    public void main(String[] args) {
+    public static void main(String[] args) {
+    	run();
+    }
     
+    public void run(){
 
 //		Open Setting GUI
 		SettingsGUI settings = new SettingsGUI();
+		settings.prepareGUI();
         settings.createUIComponents();
 //	
 //		Declare Simulation Display Window and Image
@@ -69,18 +81,18 @@ public class ParticleInteraction {
 		int whiteInt = new Color(255,255,255).getRGB();
 		Graphics2D    displayGraphics = displayImage.createGraphics();
 //	
-//		Declare Simulation Settings Vars
 //		Declare misc vars
 		
-//		Assign values to vars
 //	 	
 //	
 //	
 //	
-//		Spawn particles
 //		
 		while(true){
-			
+//			Update vars
+			updateSettings();
+//			Spawn Particles
+			spawnParticles();	
 			while(!settings.getRestartBool()){
 //	
 //				Collide particles
@@ -98,10 +110,8 @@ public class ParticleInteraction {
 //				Update Display window and/or Save display image to a folder
 				updateDisplay();
 			}
-//			Update simulation settings using values from GUI
 //			Clear the display image
 //			Delete all saved images
-//			Respawn particles 
 		}
     }
     public void collideParticles(){
@@ -143,13 +153,35 @@ public class ParticleInteraction {
 		}
 	}
 	public void calculateCenter(){
-		
+		//FINISH THIS
+		centerX=0.0;
+		centerY=0.0;
 	}
 	public void drawParticles(){
-		
+		for(int i=0; i<particleCount; i++){
+			int dispX = (int)(((particleArray[i].getXPosition()-centerX)*200)+400);
+			int dispY = (int)(((particleArray[i].getYPosition()-centerY)*200)+400);
+			int radius = (int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);
+			for (int j = dispX-radius; j <= dispX+radius;j++){
+				for (int k = dispY-radius; k <= dispY+radius;k++){
+					if ((((dispX-j)*(dispX-j)+(dispY-k)*(dispY-k))<=(radius*radius))&&(j<800)&&(k<800)&&(j>0)&&(k>0)){
+						int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
+						int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
+						int blue = (displayImage.getRGB(j,k)) & 0xff;
+						if ((red+green+blue)==0){
+							displayImage.setRGB(j,k, whiteInt);
+						}
+					}
+				}
+			}
+		}
 	}
 	public void updateDisplay(){
-		
+		frame.repaint();
+	}
+	public void blackDisplay(){
+		displayGraphics.setPaint ( new Color(0,0,0) );
+		displayGraphics.fillRect ( 0, 0, displayImage.getWidth(), displayImage.getHeight() );
 	}
     public void spawnParticles(){
     	particleArray = new Particle[particleCount];
@@ -165,5 +197,15 @@ public class ParticleInteraction {
         	}
         }
     }
-    
+    public void updateSettings(){
+		particleCount = settings.getSpinner01Value(); //System.out.println(particleCount);
+    	initialMass = settings.getSpinner02Value(); //System.out.println(initialMass);
+    	variationMass = settings.getSpinner03Value(); //System.out.println(variationMass);
+    	diskRadius = settings.getSpinner04Value(); //System.out.println(diskRadius);
+    	deltaTime = settings.getSpinner05Value(); //System.out.println(deltaTime);//timestep in seconds 
+    	constantGravity = settings.getSpinner06Value(); //System.out.println(constantGravity);//gravitational constant
+    	variationVel=settings.getSpinner07Value(); //System.out.println(variationVel);
+    	initialSpinFactor=settings.getSpinner08Value(); //System.out.println(initialSpinFactor);
+    	centralParticleMass = settings.getSpinner09Value(); //System.out.println(centralParticleMass);
+    }
 }
