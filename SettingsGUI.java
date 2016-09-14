@@ -17,14 +17,14 @@ public class SettingsGUI {
 	private JFrame mainFrame; //mainFrame is the window that contains everything
 	private JPanel mainPanel; //mainPanel is contained my mainFrame, and contains all UI components
 	
-	private int spinner01Value=1000;
+	private int spinner01Value=5000;
 	private double spinner02Value=1.0;
-	private double spinner03Value=0.9;
-	private double spinner04Value=1.5;
+	private double spinner03Value=0.5;
+	private double spinner04Value=2.0;
 	private double spinner05Value=0.001;
 	private double spinner06Value=0.001;
 	private double spinner07Value=0.000;
-	private double spinner08Value=1.0;
+	private double spinner08Value=1.2;
 	private double spinner09Value=100.0;
 	private double spinner10Value;
 	private double spinner11Value;

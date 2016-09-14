@@ -65,19 +65,19 @@ public class ParticleInteraction {
 //	
 //		Declare Simulation Display Window and Image
 		BufferedImage displayImage = new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB );
-    	JFrame frame = new JFrame();
-		ImageIcon icon = new ImageIcon(displayImage);
-		JLabel label = new JLabel(icon);
-		frame.add(label);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice defaultScreen = ge.getDefaultScreenDevice();
-        Rectangle rect = defaultScreen.getDefaultConfiguration().getBounds();
-        int frameX = (int) rect.getMaxX() - frame.getWidth();
-        int frameY = 0;
-        frame.setLocation(frameX, frameY);
-		frame.setVisible(true);
+//    	JFrame frame = new JFrame();
+//		ImageIcon icon = new ImageIcon(displayImage);
+//		JLabel label = new JLabel(icon);
+//		frame.add(label);
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		frame.pack();
+//		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+//        GraphicsDevice defaultScreen = ge.getDefaultScreenDevice();
+//        Rectangle rect = defaultScreen.getDefaultConfiguration().getBounds();
+//        int frameX = (int) rect.getMaxX() - frame.getWidth();
+//        int frameY = 0;
+//        frame.setLocation(frameX, frameY);
+//		frame.setVisible(true);
 		int blackInt = new Color(0,0,0).getRGB();
 		int whiteInt = new Color(255,255,255).getRGB();
 		Graphics2D    displayGraphics = displayImage.createGraphics();
@@ -207,6 +207,7 @@ public class ParticleInteraction {
 			settings.setRestartBool(false);
 			
 			int frameCount=0;
+			long startTime = System.nanoTime();
 			while(!settings.getRestartBool()){
 //	
 //				Collide particles
@@ -349,19 +350,20 @@ public class ParticleInteraction {
 					}
 				}
 //				Update Display window
-				frame.repaint();
+//				frame.repaint();
 				
 //				Save frame
 				frameCount++;
-				if (saveFrames){
-					try{
-			            File f = new File(".\\"+"Simulation frames (particleCount="+particleCount+")"+"\\"+String.format("%010d", frameCount)+".png");
-			            ImageIO.write(displayImage, "PNG", f);
-			        }
-			        catch(Exception e){
-			            e.printStackTrace();
-			        }
-				}
+				try{
+		            File f = new File(".\\"+"Simulation frames (particleCount="+particleCount+")"+"\\"+String.format("%010d", frameCount)+".png");
+		            ImageIO.write(displayImage, "PNG", f);
+		        }
+		        catch(Exception e){
+		            e.printStackTrace();
+		        }
+		        
+		        System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", System.nanoTime()-startTime) + " nanoseconds");
+		        startTime = System.nanoTime();
 			}
 		}
     }
