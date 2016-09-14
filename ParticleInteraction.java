@@ -36,22 +36,7 @@ public class ParticleInteraction {
      */ 
     public static void main(String[] args){
     	
-    	File directory = new File("frames");
 
-		// if the directory does not exist, create it
-		if (!directory.exists()) {
-		    boolean result = false;
-		
-		    try{
-		        directory.mkdir();
-		        result = true;
-		    } 
-		    catch(SecurityException se){
-		        //handle it
-		    }        
-		    if(result) {
-		    }
-		}
     	
     	
     	
@@ -100,6 +85,31 @@ public class ParticleInteraction {
 //		Declare misc vars
 		double collisionDistanceFactor=1;
 		boolean saveFrames=true;
+		
+//		File directory = new File("Simulation frames (particleCount="+particleCount);
+
+		// if the directory does not exist, create it
+//		if (saveFrames){
+//			if (!directory.exists()) {
+//			    boolean result = false;
+//			
+//			    try{
+//			        directory.mkdir();
+//			        result = true;
+//			    } 
+//			    catch(SecurityException se){
+//			        //handle it
+//			    }        
+//			    if(result) {
+//			    }
+//			}else{
+//				//if the directory exists, delete all existing images
+//				for(File file: directory.listFiles()) 
+//	    			if (!file.isDirectory()) 
+//	        	file.delete();
+//			}
+//		}
+		
 		int focusOn = 1; //0=origin 1=barycenter 2=largest mass
 //	 	
 //	
@@ -107,6 +117,9 @@ public class ParticleInteraction {
 //	
 //		
 		while(true){
+			
+			
+			
 //			Update vars
 			particleCount = settings.getSpinner01Value(); 
     		initialMass = settings.getSpinner02Value(); 
@@ -122,6 +135,30 @@ public class ParticleInteraction {
 			particleArray = new Particle[particleCount];
 			boolArray = new boolean[particleCount];
     		Arrays.fill(boolArray, Boolean.TRUE);
+    		
+    		File directory = new File("Simulation frames (particleCount="+particleCount+")");
+			if (saveFrames){
+				if (!directory.exists()) {
+				    boolean result = false;
+				
+				    try{
+				        directory.mkdir();
+				        result = true;
+				    } 
+				    catch(SecurityException se){
+				        //handle it
+				    }        
+				    if(result) {
+				    }
+				}else{
+					//if the directory exists, delete all existing images
+					for(File file: directory.listFiles()) 
+		    			if (!file.isDirectory()) 
+		        	file.delete();
+				}
+			}
+    		
+    		
 	        if (centralParticle){
 	        	particleArray[0]=new Particle(0,0,0,centralParticleMass,0,0,0,0,0,constantGravity,centralParticleMass);
 	        	for(int i=1; i<particleCount; i++){
@@ -195,6 +232,8 @@ public class ParticleInteraction {
 						        			maxMassID=k;
 						        		}
 						        	}
+						        	displayGraphics.setPaint ( new Color(0,0,0) );
+									displayGraphics.fillRect ( 0, 0, displayImage.getWidth(), displayImage.getHeight() );
 								}
 							}
 						}
@@ -215,22 +254,47 @@ public class ParticleInteraction {
 					}
 				}
 				
-//				Erase old particle
+				//			calculate focus
+		        if (focusOn==1){  //Full System Barycenter
+			        double sumMass=0;
+					double sumX=0;
+					double sumY=0;
+					for(int i=0; i<particleCount;i++){
+						if (boolArray[i]){
+							sumMass+=particleArray[i].getMass();
+							sumX+=particleArray[i].getXPosition()*particleArray[i].getMass();
+							sumY+=particleArray[i].getYPosition()*particleArray[i].getMass();
+						}
+					}
+					sumX/=sumMass;
+					sumY/=sumMass;
+					centerX=sumX;
+					centerY=sumY;
+		        }else if(focusOn==2){  //Largest Particle
+	        		centerX=particleArray[maxMassID].getXPosition();
+					centerY=particleArray[maxMassID].getYPosition();
+		        }else{ //Origin
+		        	centerX=0;
+		        	centerY=0;
+		        }
+				
+				//erase old particles
 				for(int i=0; i<particleCount; i++){
 					if (boolArray[i]){
 						int dispX = (int)(((particleArray[i].getXPosition()-centerX)*200)+400);
 						int dispY = (int)(((particleArray[i].getYPosition()-centerY)*200)+400);
 						int radius = (int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);
-						for (int j = dispX-radius-5; j <= dispX+radius+5;j++){
-							for (int k = dispY-radius-5; k <= dispY+radius+5;k++){
-								if((j<800)&&(k<800)&&(j>0)&&(k>0)){
-										displayImage.setRGB(j,k, blackInt);
-								}
-							}
-						}
+//						for (int j = dispX-radius-5; j <= dispX+radius+5;j++){
+//							for (int k = dispY-radius-5; k <= dispY+radius+5;k++){
+//								if((j<800)&&(k<800)&&(j>0)&&(k>0)){
+//										displayImage.setRGB(j,k, blackInt);
+//								}
+//							}
+//						}
+						displayGraphics.setPaint ( new Color(0,0,0) );
+						displayGraphics.fillRect ( dispX-radius-5, dispY-radius-5, dispX+radius+5, dispY+radius+5);
 					}
 				}
-				
 				
 //				Update velocities and positions of particles
 				for(int i=0; i<particleCount; i++){
@@ -266,6 +330,8 @@ public class ParticleInteraction {
 		        }
 				
 //				Draw particles
+				displayGraphics.setPaint ( new Color(0,0,0) );
+				displayGraphics.fillRect ( 0, 0, displayImage.getWidth(), displayImage.getHeight() );
 				for(int i=0; i<particleCount; i++){
 					if (boolArray[i]){
 						int dispX = (int)(((particleArray[i].getXPosition()-centerX)*200)+400);
@@ -275,12 +341,7 @@ public class ParticleInteraction {
 							for (int k = dispY-radius-5; k <= dispY+radius+5;k++){
 								if((j<800)&&(k<800)&&(j>0)&&(k>0)){
 									if (((dispX-j)*(dispX-j)+(dispY-k)*(dispY-k))<=(radius*radius)){
-										int red = (displayImage.getRGB(j,k) >> 16) & 0xff;
-										int green = (displayImage.getRGB(j,k) >> 8) & 0xff;
-										int blue = (displayImage.getRGB(j,k)) & 0xff;
-										if (true||(red+green+blue)==0){
-											displayImage.setRGB(j,k, whiteInt);
-										}
+										displayImage.setRGB(j,k, whiteInt);
 									}
 								}
 							}
@@ -294,7 +355,7 @@ public class ParticleInteraction {
 				frameCount++;
 				if (saveFrames){
 					try{
-			            File f = new File(".\\frames\\"+String.format("%010d", frameCount)+".png");
+			            File f = new File(".\\"+"Simulation frames (particleCount="+particleCount+")"+"\\"+String.format("%010d", frameCount)+".png");
 			            ImageIO.write(displayImage, "PNG", f);
 			        }
 			        catch(Exception e){
