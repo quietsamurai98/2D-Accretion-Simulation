@@ -19,8 +19,8 @@ public class SettingsGUI {
 	
 	private int spinner01Value=100;
 	private double spinner02Value=1.0;
-	private double spinner03Value=0.9;
-	private double spinner04Value=1.5;
+	private double spinner03Value=0.5;
+	private double spinner04Value=1.0;
 	private double spinner05Value=0.001;
 	private double spinner06Value=0.001;
 	private double spinner07Value=0.000;
