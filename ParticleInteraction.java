@@ -88,7 +88,7 @@ public class ParticleInteraction {
 		}
     }
     private void updateVars(){
-		particleCount       = 100000; 
+		particleCount       = 10000; 
 		initialMass         = 1.0; 
 		variationMass       = 0.5; 
 		diskRadius          = 8.0; 
@@ -227,14 +227,18 @@ public class ParticleInteraction {
     }
     private void calculateGrav(){
     	for(int i=0; i<particleCount; i++){
+    		particleArray[i].zeroForce();
+    	}
+    	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
-				particleArray[i].setXForce(0.0);
-				particleArray[i].setYForce(0.0);
 				for(int j=0; j<particleCount; j++){
 					if(i!=j&&boolArray[j]){
-						double angle = Math.atan2(particleArray[i].getYPosition()-particleArray[j].getYPosition(),particleArray[i].getXPosition()-particleArray[j].getXPosition());
-						double forceTotal = constantGravity*particleArray[i].getMass()*particleArray[j].getMass()/(Math.pow((particleArray[i].getXPosition()-particleArray[j].getXPosition()),2.0)+Math.pow((particleArray[i].getYPosition()-particleArray[j].getYPosition()),2.0));
-						particleArray[i].updateForceXY(angle, forceTotal);
+						double rX = particleArray[i].getXPosition()-particleArray[j].getXPosition();
+						double rY = particleArray[i].getYPosition()-particleArray[j].getYPosition();
+						double rT = Math.sqrt(rX*rX+rY*rY);
+						double rF = rT*rT*rT;
+						double fT = -particleArray[i].getMass()*particleArray[j].getMass()/(rF*1000);
+						particleArray[i].updateForce(rX*fT, rY*fT);
 					}
 				}
 			}

@@ -117,8 +117,12 @@ public class Particle {
 	    xPosition += xVelocity*deltaTime;
         yPosition += yVelocity*deltaTime;
     }
-    public void updateForceXY(double angle, double forceTotal){
-    	xForce -= Math.cos(angle)*forceTotal;
-        yForce -= Math.sin(angle)*forceTotal;
+    public void updateForce(double xF, double yF){
+    	xForce += xF;
+    	yForce += yF;
+    }
+    public void zeroForce(){
+    	xForce = 0;
+    	yForce = 0;
     }
 }
