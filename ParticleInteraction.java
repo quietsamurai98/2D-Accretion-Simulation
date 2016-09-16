@@ -61,7 +61,7 @@ public class ParticleInteraction {
 	int focusOn = 1; //0=origin 1=barycenter 2=largest mass
     
     public ParticleInteraction() {
-    	frameCap=10;
+    	frameCap=1;
 		frameCount=0;
 		particleCount=1;
 		simulate();
@@ -80,9 +80,7 @@ public class ParticleInteraction {
 	        frameCount=0;
 			startTime = System.nanoTime();
 			while(frameCount<frameCap){
-				startTimeTest = System.nanoTime();
-				collideParticles();
-				collide += System.nanoTime()-startTimeTest;
+				
 				
 				startTimeTest = System.nanoTime();
 				calculateGrav();
@@ -107,14 +105,15 @@ public class ParticleInteraction {
 				startTimeTest = System.nanoTime();
 				drawParticles();
 				draw += System.nanoTime()-startTimeTest;
-				 
+				
 				startTimeTest = System.nanoTime();
 				saveFrame();
 				save += System.nanoTime()-startTimeTest;
-				 
-	//			startTimeTest = System.nanoTime();
-	//	        printTime();
-	//	        timePrint += System.nanoTime()-startTimeTest;
+				
+				//collideParticles(); comes FIRST in an actual simulation, but it reduces how long other methods take so you can't see how calculation time scales with particleCount
+				startTimeTest = System.nanoTime();
+				collideParticles();
+				collide += System.nanoTime()-startTimeTest; 
 			}
 			System.out.println(
 	        	"Amount of time taken by each method over the course of "+frameCap+" frames, simulating "+particleCount+" particles:\n"+
