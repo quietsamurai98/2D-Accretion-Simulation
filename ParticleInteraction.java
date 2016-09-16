@@ -27,7 +27,6 @@ public class ParticleInteraction {
      * Creates a new instance of <code>ParticleInteraction</code>.
      */
     
-    SettingsGUI settings = new SettingsGUI();
     
     Particle[] particleArray = new Particle[0];
 	boolean[] boolArray = new boolean[0];
@@ -48,10 +47,10 @@ public class ParticleInteraction {
    	double maxMass;
 	int frameCount;
 	long startTime;
-
+	int imageSize=3200;
 //	
 //		Declare Simulation Display Image
-	BufferedImage displayImage = new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB );
+	BufferedImage displayImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_RGB );
 	int blackInt = new Color(0,0,0).getRGB();
 	int whiteInt = new Color(255,255,255).getRGB();
 	Graphics2D    displayGraphics = displayImage.createGraphics();
@@ -62,11 +61,6 @@ public class ParticleInteraction {
 	int focusOn = 1; //0=origin 1=barycenter 2=largest mass
     
     public ParticleInteraction() {
-//		Open Setting GUI
-		SettingsGUI settings = new SettingsGUI();
-		settings.prepareGUI();
-    	settings.createUIComponents();
-    	settings.setRestartBool(false);
 		simulate();
     }
     
@@ -74,41 +68,36 @@ public class ParticleInteraction {
      * @param args the command line arguments
      */ 
     public void simulate(){
-    	
+		updateVars();
+		createDirectory();
+		spawnParticles();
+        updateFocus();
+        wipeImage();
+		frameCount=0;
+		startTime = System.nanoTime();
 		while(true){
-			updateVars();
-			createDirectory();
-			spawnParticles();
+			collideParticles();
+			calculateGrav();
 	        updateFocus();
-	        wipeImage();
-
-			int frameCount=0;
-			long startTime = System.nanoTime();
-			settings.setRestartBool(false);
-			while(!settings.getRestartBool()){
-				collideParticles();
-				calculateGrav();
-		        updateFocus();
-				eraseParticles();
-				updateVelAndPos();
-		        updateFocus();
-				drawParticles();
-				saveFrame();
-		        printTime();
-			}
+			eraseParticles();
+			updateVelAndPos();
+	        updateFocus();
+			drawParticles();
+			saveFrame();
+	        printTime();
 		}
     }
     private void updateVars(){
-		particleCount = settings.getSpinner01Value(); 
-		initialMass = settings.getSpinner02Value(); 
-		variationMass = settings.getSpinner03Value(); 
-		diskRadius = settings.getSpinner04Value(); 
-		deltaTime = settings.getSpinner05Value(); 
-		constantGravity = settings.getSpinner06Value(); 
-		variationVel=settings.getSpinner07Value(); 
-		initialSpinFactor=settings.getSpinner08Value(); 
-		centralParticleMass = settings.getSpinner09Value(); 
-		centralParticle = true; //ADD CHECKBOX TO GUI TO SET THIS!
+		particleCount       = 100000; 
+		initialMass         = 1.0; 
+		variationMass       = 0.5; 
+		diskRadius          = 8.0; 
+		deltaTime           = 0.001; 
+		constantGravity     = 0.001; 
+		variationVel        = 10.000; 
+		initialSpinFactor   = 0.0; 
+		centralParticleMass = 100; 
+		centralParticle     = false;
     	
     }
     private void createDirectory(){
@@ -151,7 +140,7 @@ public class ParticleInteraction {
         }
         maxMass=-Double.MAX_VALUE;
     	for(int i=0; i<particleCount;i++){
-    		if (particleArray[i].getMass()>maxMass){
+    		if (boolArray[i]&&particleArray[i].getMass()>maxMass){
     			maxMass=particleArray[i].getMass();
     			maxMassID=i;
     		}
@@ -163,9 +152,11 @@ public class ParticleInteraction {
 			double sumX=0;
 			double sumY=0;
 			for(int i=0; i<particleCount;i++){
-				sumMass+=particleArray[i].getMass();
-				sumX+=particleArray[i].getXPosition()*particleArray[i].getMass();
-				sumY+=particleArray[i].getYPosition()*particleArray[i].getMass();
+				if (boolArray[i]){
+					sumMass+=particleArray[i].getMass();
+					sumX+=particleArray[i].getXPosition()*particleArray[i].getMass();
+					sumY+=particleArray[i].getYPosition()*particleArray[i].getMass();
+				}
 			}
 			sumX/=sumMass;
 			sumY/=sumMass;
@@ -186,8 +177,8 @@ public class ParticleInteraction {
     private void eraseParticles(){
 		for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
-				int dispX = (int)(((particleArray[i].getXPosition()-centerX)*200)+400);
-				int dispY = (int)(((particleArray[i].getYPosition()-centerY)*200)+400);
+				int dispX = (int)(((particleArray[i].getXPosition()-centerX)*200)+imageSize/2);
+				int dispY = (int)(((particleArray[i].getYPosition()-centerY)*200)+imageSize/2);
 				int radius = (int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);
 				displayGraphics.setPaint ( new Color(0,0,0) );
 				displayGraphics.fillRect ( dispX-radius-5, dispY-radius-5, dispX+radius+5, dispY+radius+5);
@@ -205,12 +196,12 @@ public class ParticleInteraction {
     private void drawParticles(){
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
-				int dispX = (int)(((particleArray[i].getXPosition()-centerX)*200)+400);
-				int dispY = (int)(((particleArray[i].getYPosition()-centerY)*200)+400);
+				int dispX = (int)(((particleArray[i].getXPosition()-centerX)*200)+imageSize/2);
+				int dispY = (int)(((particleArray[i].getYPosition()-centerY)*200)+imageSize/2);
 				int radius = (int)((Math.sqrt(particleArray[i].getMass())+0.5)/2);
 				for (int j = dispX-radius-5; j <= dispX+radius+5;j++){
 					for (int k = dispY-radius; k <= dispY+radius;k++){
-						if((j<800)&&(k<800)&&(j>0)&&(k>0)){
+						if((j<imageSize)&&(k<imageSize)&&(j>0)&&(k>0)){
 							if (((dispX-j)*(dispX-j)+(dispY-k)*(dispY-k))<=(radius*radius)){
 								displayImage.setRGB(j,k, whiteInt);
 							}
@@ -236,9 +227,9 @@ public class ParticleInteraction {
     }
     private void calculateGrav(){
     	for(int i=0; i<particleCount; i++){
-			particleArray[i].setXForce(0.0);
-			particleArray[i].setYForce(0.0);
 			if (boolArray[i]){
+				particleArray[i].setXForce(0.0);
+				particleArray[i].setYForce(0.0);
 				for(int j=0; j<particleCount; j++){
 					if(i!=j&&boolArray[j]){
 						double angle = Math.atan2(particleArray[i].getYPosition()-particleArray[j].getYPosition(),particleArray[i].getXPosition()-particleArray[j].getXPosition());
@@ -250,6 +241,7 @@ public class ParticleInteraction {
 		}
     }
     private void collideParticles(){
+    	boolean collisionOccuredTest = false;
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
 	    		for(int j=0; j<particleCount; j++){
@@ -272,12 +264,14 @@ public class ParticleInteraction {
 				        			maxMassID=k;
 				        		}
 				        	}
-				        	displayGraphics.setPaint ( new Color(0,0,0) );
-							displayGraphics.fillRect ( 0, 0, displayImage.getWidth(), displayImage.getHeight() );
+				        	collisionOccuredTest=true;
 						}
 					}
 				}
 			}
+		}
+		if (collisionOccuredTest){
+			 wipeImage();
 		}
     }
 }
