@@ -18,6 +18,10 @@ public class SimulationRunner {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        ParticleInteraction simulationInstance = new ParticleInteraction();
+    	int particleCount      = 5000;
+    	int frameSize          = 1080;
+    	boolean saveFrameImage = true;
+    	boolean saveFrameText  = true;
+        ParticleInteraction simulationInstance = new ParticleInteraction(particleCount, frameSize, saveFrameImage, saveFrameText);
     }
 }
