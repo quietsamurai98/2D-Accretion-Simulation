@@ -125,4 +125,8 @@ public class Particle {
     	xForce = 0;
     	yForce = 0;
     }
+    public String toString(){
+    	String out = xPosition + " " + yPosition + " " + mass;
+    	return out;
+    }
 }

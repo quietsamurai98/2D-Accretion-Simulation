@@ -48,27 +48,46 @@ public class ParticleInteraction {
 	int frameCount;
 	long startTime;
 	int imageSize=3200;
-//	
-//		Declare Simulation Display Image
-	BufferedImage displayImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_RGB );
+	BufferedImage displayImage;
 	int blackInt = new Color(0,0,0).getRGB();
 	int whiteInt = new Color(255,255,255).getRGB();
-	Graphics2D    displayGraphics = displayImage.createGraphics();
-//	
-//		Declare misc vars
-	double collisionDistanceFactor=1;
-	boolean saveFrames=true;
+	Graphics2D    displayGraphics;
+	double collisionDistanceFactor;
+	boolean saveFrames;
+	boolean saveFrameImages;
+	boolean saveFrameText;
 	int focusOn = 1; //0=origin 1=barycenter 2=largest mass
     
-    public ParticleInteraction() {
-		simulate();
+    public ParticleInteraction(int particles, int size, boolean images, boolean text) {
+    	saveFrameImages = images;
+    	saveFrameText   = text;
+    	saveFrames = saveFrameImages||saveFrameText;
+    	imageSize = size;
+    	displayImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_RGB );
+    	displayGraphics = displayImage.createGraphics();
+		simulate(particles);
     }
     
     /**
      * @param args the command line arguments
-     */ 
-    public void simulate(){
-		updateVars();
+     */    
+     private void updateVars(int particles){
+		particleCount           = particles; 
+		initialMass             = 1.0; 
+		variationMass           = 0.5; 
+		diskRadius              = 2.0; 
+		deltaTime               = 0.001; 
+		constantGravity         = 0.001; 
+		variationVel            = 5.000; 
+		initialSpinFactor       = 0.0; 
+		centralParticleMass     = 100; 
+		centralParticle         = false;
+		collisionDistanceFactor = 1.0;
+    } 
+    	
+    	
+    public void simulate(int particles){
+		updateVars(particles);
 		createDirectory();
 		spawnParticles();
         updateFocus();
@@ -79,27 +98,23 @@ public class ParticleInteraction {
 			collideParticles();
 			calculateGrav();
 	        updateFocus();
-			eraseParticles();
-			updateVelAndPos();
-	        updateFocus();
-			drawParticles();
-			saveFrame();
+	        frameCount++;
+			if (saveFrameImages){
+				eraseParticles();
+				stepTime();
+		        updateFocus();
+				drawParticles();
+				saveImage();
+			}else{
+				stepTime();
+			}
+			if (saveFrameText){
+				saveText();
+			}
 	        printTime();
 		}
     }
-    private void updateVars(){
-		particleCount       = 10000; 
-		initialMass         = 1.0; 
-		variationMass       = 0.5; 
-		diskRadius          = 8.0; 
-		deltaTime           = 0.001; 
-		constantGravity     = 0.001; 
-		variationVel        = 10.000; 
-		initialSpinFactor   = 0.0; 
-		centralParticleMass = 100; 
-		centralParticle     = false;
-    	
-    }
+
     private void createDirectory(){
     	File directory = new File("Simulation frames (particleCount="+particleCount+")");
 		if (saveFrames){
@@ -121,6 +136,33 @@ public class ParticleInteraction {
 	    			if (!file.isDirectory()) 
 	        	file.delete();
 			}
+			String outputFileName = ".\\"+"Simulation frames (particleCount="+particleCount+")"+"\\"   + "Simulation settings.txt";
+	        File outputFile = new File(outputFileName);
+	        PrintWriter output = null;
+	        try {
+	        	output = new PrintWriter(outputFile);
+	        }
+	        catch (FileNotFoundException ex){
+	        	System.out.println("File "+outputFileName+" not found.");
+	        	System.exit(1);
+	        }
+	        
+	        output.println(
+	        	
+					"particleCount           = "+ particleCount + "\r\n" +
+					"initialMass             = "+ initialMass + "\r\n" +
+					"variationMass           = "+ variationMass + "\r\n" +
+					"diskRadius              = "+ diskRadius + "\r\n" +
+					"deltaTime               = "+ deltaTime + "\r\n" +
+					"constantGravity         = "+ constantGravity + "\r\n" +
+					"variationVel            = "+ variationVel + "\r\n" +
+					"initialSpinFactor       = "+ initialSpinFactor + "\r\n" +
+					"centralParticleMass     = "+ centralParticleMass + "\r\n" +
+					"centralParticle         = "+ Boolean.toString(centralParticle) + "\r\n" +
+					"collisionDistanceFactor = "+ collisionDistanceFactor
+	        	
+	        	);
+	        output.close();
 		}
     }
     private void spawnParticles(){
@@ -185,11 +227,12 @@ public class ParticleInteraction {
 			}
 		}
     }
-    private void updateVelAndPos(){
+    private void stepTime(){
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
 		        particleArray[i].updateVel(deltaTime);
 		        particleArray[i].updatePos(deltaTime);
+		        particleArray[i].zeroForce();
 			}
 		}
     }
@@ -211,8 +254,7 @@ public class ParticleInteraction {
 			}
 		}
     }
-    private void saveFrame(){
-    	frameCount++;
+    private void saveImage(){
 		try{
             File f = new File(".\\"+"Simulation frames (particleCount="+particleCount+")"+"\\"+String.format("%010d", frameCount)+".png");
             ImageIO.write(displayImage, "PNG", f);
@@ -221,14 +263,28 @@ public class ParticleInteraction {
             e.printStackTrace();
         }
     }
+    private void saveText(){
+		String outputFileName = ".\\"+"Simulation frames (particleCount="+particleCount+")"+"\\"+String.format("%010d", frameCount)+".txt";
+        File outputFile = new File(outputFileName);
+        PrintWriter output = null;
+        try {
+        	output = new PrintWriter(outputFile);
+        }
+        catch (FileNotFoundException ex){
+        	System.out.println("File "+outputFileName+" not found.");
+        	System.exit(1);
+        }
+        
+        for(int i=0;i<particleCount;i++){
+        	output.println(particleArray[i] + " " + boolArray[i]);
+        }
+        output.close();
+    }
     private void printTime(){
     	System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", System.nanoTime()-startTime) + " nanoseconds");
 		startTime = System.nanoTime();
     }
     private void calculateGrav(){
-    	for(int i=0; i<particleCount; i++){
-    		particleArray[i].zeroForce();
-    	}
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
 				for(int j=0; j<particleCount; j++){
