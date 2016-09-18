@@ -31,23 +31,36 @@ public class Render {
 	String directoryTextString;
 	String directoryImageString;
 	int particleCount;
-	int frameCap;
+	int frameEnd;
+	int frameStart;
+	int frameSkip;
+	int picCount;
+	double zoom;
+	long startTime, elapsedTime;
 	
-    public Render(int partCount, int frameLimit, int resolution) {
+    public Render(int partCount, int frameStartConstruct, int frameEndConstruct, int frameSkipConstruct, int resolution, double zoomFactor) {
     	particleCount = partCount;
     	directoryTextString = ".\\"+"Simulation text frames (particleCount="+particleCount+")"+"\\";
     	directoryImageString = ".\\"+"Simulation image frames (particleCount="+particleCount+")"+"\\";
-    	frameCap   = frameLimit;
-    	imageSize=resolution;
+    	frameStart = frameStartConstruct;
+    	frameEnd   = frameEndConstruct;
+    	frameSkip  = frameSkipConstruct;
+    	imageSize  = resolution;
+    	zoom       = zoomFactor;
     	createDirectory(particleCount);	
     }
     public void methodRunner(){
-    	for(int frameCount=1;frameCount<=frameCap;frameCount++){
+    	picCount=0;
+    	for(int frameCount=frameStart;frameCount<=frameEnd;frameCount+=frameSkip){
+    		startTime=System.nanoTime();
+	    	picCount++;
 	    	readTextFile(frameCount);
 	    	focus();
 	    	drawParticles();
 	    	saveImage(frameCount);
-	    	System.out.println("Frame "+frameCount+" saved.");
+	    	elapsedTime=System.nanoTime()-startTime;
+	    	System.out.println("Image "+picCount+" (Frame " + frameCount + ") saved (took " + String.format("%014d", elapsedTime) + " nanoseconds)");
+	    	
     	}
     }
     private void readTextFile(int frameCount){
@@ -114,9 +127,9 @@ public class Render {
     	displayImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_RGB );
     	displayGraphics = displayImage.createGraphics();
     	for(int i=0; i<length; i++){
-			int dispX = (int)(((x[i]-centerX)*200)+imageSize/2);
-			int dispY = (int)(((y[i]-centerY)*200)+imageSize/2);
-			int radius = (int)((Math.sqrt(m[i])+0.5)/2);
+			int dispX = (int)(((x[i]-centerX)*200*zoom)+imageSize/2);
+			int dispY = (int)(((y[i]-centerY)*200*zoom)+imageSize/2);
+			int radius = (int)((Math.sqrt(m[i])+0.5)/2*zoom);
 			for (int j = dispX-radius; j <= dispX+radius;j++){
 				for (int k = dispY-radius; k <= dispY+radius;k++){
 					if((j<imageSize)&&(k<imageSize)&&(j>0)&&(k>0)){
@@ -130,7 +143,7 @@ public class Render {
 	}
 	private void saveImage(int frameCount){
 		try{
-            File f = new File(directoryImageString+String.format("%010d", frameCount)+".png");
+            File f = new File(directoryImageString+String.format("%010d", picCount)+".png");
             ImageIO.write(displayImage, "PNG", f);
         }
         catch(Exception e){

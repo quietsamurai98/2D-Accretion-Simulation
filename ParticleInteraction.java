@@ -37,6 +37,7 @@ public class ParticleInteraction {
 	int frameCount;
 	long startTime, elapsedTime;
 	double collisionDistanceFactor;
+	int particleNum;
     public ParticleInteraction(int particles) {
 		simulate(particles);
     }
@@ -51,12 +52,14 @@ public class ParticleInteraction {
 		diskRadius              = 8.0; 
 		deltaTime               = 0.001; 
 		constantGravity         = 0.001; 
-		variationVel            = 20.000; 
+		variationVel            = 5.000; 
 		initialSpinFactor       = 0.0;
-		randomSpin			    = 0.0;
+		randomSpin			    = 100.0;
 		centralParticleMass     = 100; 
 		centralParticle         = false;
 		collisionDistanceFactor = 1.0;
+		
+		particleNum             = particleCount;
     } 
     	
     	
@@ -66,7 +69,7 @@ public class ParticleInteraction {
 		spawnParticles();
 		frameCount=0;
 		startTime = System.nanoTime();
-		while(true){
+		while(particleNum>1){
 			startTime = System.nanoTime();
 			collideParticles();
 			calculateGrav();
@@ -136,12 +139,12 @@ public class ParticleInteraction {
         if (centralParticle){
         	particleArray[0]=new Particle(0,0,0,centralParticleMass,0,0,0,0,0,constantGravity,centralParticleMass);
         	for(int i=1; i<particleCount; i++){
-        		particleArray[i]=new Particle(diskRadius,0,0,initialMass,variationMass,0,variationVel,initialSpinFactor,0,constantGravity,centralParticleMass+((particleCount-1)*initialMass*0));
+        		particleArray[i]=new Particle(diskRadius,0,0,initialMass,variationMass,0,variationVel,initialSpinFactor,randomSpin,constantGravity,centralParticleMass+((particleCount-1)*initialMass*0));
         	}
         }
         else{
         	for(int i=0; i<particleCount; i++){
-        		particleArray[i]=new Particle(diskRadius,0,0,initialMass,variationMass,0,variationVel,initialSpinFactor,0,constantGravity,initialMass*particleCount);
+        		particleArray[i]=new Particle(diskRadius,0,0,initialMass,variationMass,0,variationVel,initialSpinFactor,randomSpin,constantGravity,initialMass*particleCount);
         	}
         }
         maxMass=-Double.MAX_VALUE;
@@ -153,11 +156,13 @@ public class ParticleInteraction {
     	}
     }
     private void stepTime(){
+    	particleNum=0;
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
 		        particleArray[i].updateVel(deltaTime);
 		        particleArray[i].updatePos(deltaTime);
 		        particleArray[i].zeroForce();
+		        particleNum++;
 			}
 		}
     }
@@ -182,7 +187,7 @@ public class ParticleInteraction {
     }
     private void printTime(){
     	
-    	System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds");
+    	System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained " + particleNum + " particles");
 //		String outputFileName = ".\\"+"Simulation text frames (particleCount="+particleCount+")"+"\\"+"Computation time per frame.txt";
 //        try{
 //			File file =new File(outputFileName);
@@ -218,30 +223,28 @@ public class ParticleInteraction {
 		}
     }
     private void collideParticles(){
-    	boolean collisionOccuredTest = false;
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
 	    		for(int j=0; j<particleCount; j++){
-	    			if(i!=j&&boolArray[j]){
-	    				double minDist=Math.pow((((Math.sqrt(particleArray[i].getMass())+0.5)/2.0)+((Math.sqrt(particleArray[j].getMass())+0.5)/2.0))*collisionDistanceFactor,2);
-	    				if (Math.pow((int)((particleArray[i].getXPosition()*200)+400)-(int)((particleArray[j].getXPosition()*200)+400),2)+Math.pow((int)((particleArray[i].getYPosition()*200)+400)-(int)((particleArray[j].getYPosition()*200)+400),2)<=minDist){
-	  		  				particleArray[i].setXVelocity(((particleArray[i].getMass()*particleArray[i].getXVelocity())+(particleArray[j].getMass()*particleArray[j].getXVelocity()))/(particleArray[i].getMass()+particleArray[j].getMass()));
-	    					particleArray[i].setYVelocity(((particleArray[i].getMass()*particleArray[i].getYVelocity())+(particleArray[j].getMass()*particleArray[j].getYVelocity()))/(particleArray[i].getMass()+particleArray[j].getMass()));
-	    					particleArray[i].setXPosition(((particleArray[i].getMass()*particleArray[i].getXPosition())+(particleArray[j].getMass()*particleArray[j].getXPosition()))/(particleArray[i].getMass()+particleArray[j].getMass()));
-	    					particleArray[i].setYPosition(((particleArray[i].getMass()*particleArray[i].getYPosition())+(particleArray[j].getMass()*particleArray[j].getYPosition()))/(particleArray[i].getMass()+particleArray[j].getMass()));
-	    					particleArray[i].setMass(particleArray[i].getMass()+particleArray[j].getMass());
-							particleArray[j].setXPosition(1000000.0*(Math.random()+1.0));
-							particleArray[j].setYPosition(1000000.0*(Math.random()+1.0));
-							particleArray[j].setMass(0.000000001);
+	    			if(boolArray[j]&&i!=j){
+	    				double massI   = particleArray[i].getMass();
+	  		  			double massJ   = particleArray[j].getMass();
+	  		  			int posXI = (int)(particleArray[i].getXPosition()*200)+400;
+	  		  			int posYI = (int)(particleArray[i].getYPosition()*200)+400;
+	  		  			int posXJ = (int)(particleArray[j].getXPosition()*200)+400;
+	  		  			int posYJ = (int)(particleArray[j].getYPosition()*200)+400;
+	    				double minDist = Math.pow(((Math.sqrt(massI)+Math.sqrt(massJ)+1)/2)*collisionDistanceFactor,2);
+	    				if (Math.pow(posXI-posXJ,2)<=minDist && Math.pow(posYI-posYJ,2)<=minDist && Math.pow(posXI-posXJ,2)+Math.pow(posYI-posYJ,2)<=minDist){
+	  		  				double massTotal = massI+massJ;
+	  		  				particleArray[i].setXVelocity(((massI*particleArray[i].getXVelocity())+(massJ*particleArray[j].getXVelocity()))/massTotal);
+	    					particleArray[i].setYVelocity(((massI*particleArray[i].getYVelocity())+(massJ*particleArray[j].getYVelocity()))/massTotal);
+	    					particleArray[i].setXPosition(((massI*particleArray[i].getXPosition())+(massJ*particleArray[j].getXPosition()))/massTotal);
+	    					particleArray[i].setYPosition(((massI*particleArray[i].getYPosition())+(massJ*particleArray[j].getYPosition()))/massTotal);
+	    					particleArray[i].setMass(massTotal);
+							particleArray[j].setXPosition(10000000);
+							particleArray[j].setYPosition(10000000);
+							particleArray[j].setMass(0);
 							boolArray[j]=false;
-							maxMass=-Double.MAX_VALUE;
-				        	for(int k=0; k<particleCount;k++){
-				        		if (boolArray[k]&&particleArray[k].getMass()>maxMass){
-				        			maxMass=particleArray[k].getMass();
-				        			maxMassID=k;
-				        		}
-				        	}
-				        	collisionOccuredTest=true;
 						}
 					}
 				}

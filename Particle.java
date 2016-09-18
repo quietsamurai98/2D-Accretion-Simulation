@@ -18,6 +18,7 @@ public class Particle {
 	private double yForce;
 	private double mass;
 	private double distToCenter;
+	private double randSpin;
 	public Particle() {
     	xPosition=0.0;
 		yPosition=0.0;
@@ -38,6 +39,7 @@ public class Particle {
 		yAcceleration=0.0;
 		xForce=0.0;
 		yForce=0.0;
+		randSpin=varySpin;
 		mass=initialMass+((Math.random()*2.0-1.0)*varyMass);
 		if (!(diskRadius==0.0)){
 			double rad = Math.sqrt(randGen.nextDouble()*diskRadius)/(Math.sqrt(2)/2);
@@ -45,13 +47,22 @@ public class Particle {
 			
 			double xOffset=rad*Math.cos(theta);
 			double yOffset=rad*Math.sin(theta);
-			
 			xPosition+=xOffset;
 			yPosition+=yOffset;
 			distToCenter=Math.sqrt((xPosition-diskCenterX)*(xPosition-diskCenterX)+(yPosition-diskCenterY)*(yPosition-diskCenterY));
 			double spin=Math.sqrt((constantGravity*baryMass)/distToCenter)*spinFactor;
-			xVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((yPosition-diskCenterY)/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
-			yVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((0.0-(xPosition-diskCenterX))/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
+			xVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
+			yVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
+			
+			if (randSpin==0){
+				rad = 0;
+			}else{
+				rad = randGen.nextGaussian()*Math.min(randSpin/4.0 , 1.0/4.0)+((int)(Math.random()*2.0-1.0)*randSpin); //The distribution for this can be seen at https://www.desmos.com/calculator/u6wrxpbbsp
+			}																										   //In the desmos version, c=randSpin
+			theta=Math.atan2(yPosition,xPosition) + 0.5*Math.PI;
+			
+			xVelocity=+rad*Math.cos(theta);
+			yVelocity=rad*Math.sin(theta);
 		}
     }
     public double getXPosition(){
