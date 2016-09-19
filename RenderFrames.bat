@@ -1,1 +1,1 @@
-java -jar RenderFrames.jar
+@java -jar RenderFrames.jar
