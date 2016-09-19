@@ -49,12 +49,12 @@ public class ParticleInteraction {
 		particleCount           = particles; 
 		initialMass             = 1.0; 
 		variationMass           = 0.5; 
-		diskRadius              = 8.0; 
+		diskRadius              = 4.0; 
 		deltaTime               = 0.001; 
 		constantGravity         = 0.001; 
-		variationVel            = 5.000; 
+		variationVel            = 0.000; 
 		initialSpinFactor       = 0.0;
-		randomSpin			    = 100.0;
+		randomSpin			    = 0.5;
 		centralParticleMass     = 100; 
 		centralParticle         = false;
 		collisionDistanceFactor = 1.0;

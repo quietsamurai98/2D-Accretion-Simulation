@@ -54,13 +54,12 @@ public class Particle {
 			xVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
 			yVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
 			
-			if (randSpin==0){
-				rad = 0;
+			if (Math.random()<0.5){
+				rad = randGen.nextGaussian()-randSpin;
 			}else{
-				rad = randGen.nextGaussian()*Math.min(randSpin/4.0 , 1.0/4.0)+((int)(Math.random()*2.0-1.0)*randSpin); //The distribution for this can be seen at https://www.desmos.com/calculator/u6wrxpbbsp
-			}																										   //In the desmos version, c=randSpin
+				rad = randGen.nextGaussian()+randSpin;	
+			}
 			theta=Math.atan2(yPosition,xPosition) + 0.5*Math.PI;
-			
 			xVelocity=+rad*Math.cos(theta);
 			yVelocity=rad*Math.sin(theta);
 		}

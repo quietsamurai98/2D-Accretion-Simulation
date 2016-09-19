@@ -18,7 +18,7 @@ public class SimulationRunner {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-    	int particleCount      = 100000;
+    	int particleCount      = 10000;
     	System.out.println("Particle count = "+particleCount);
         ParticleInteraction simulationInstance = new ParticleInteraction(particleCount);
     }
