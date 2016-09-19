@@ -1,1 +1,1 @@
-java -jar Simulation.jar
+@java -jar Simulation.jar
