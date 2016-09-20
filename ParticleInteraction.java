@@ -37,6 +37,9 @@ public class ParticleInteraction {
 	int frameCount;
 	long startTime, elapsedTime;
 	double collisionDistanceFactor;
+	double systemMass;
+	double escapeVelocity;
+	int orbitNum;
 	int particleNum;
     public ParticleInteraction(int particles) {
 		simulate(particles);
@@ -47,14 +50,15 @@ public class ParticleInteraction {
      */    
      private void updateVars(int particles){
 		particleCount           = particles; 
+		orbitNum                = particles;
 		initialMass             = 1.0; 
 		variationMass           = 0.5; 
-		diskRadius              = 4.0; 
+		diskRadius              = 15.0; 
 		deltaTime               = 0.001; 
 		constantGravity         = 0.001; 
 		variationVel            = 0.000; 
 		initialSpinFactor       = 0.0;
-		randomSpin			    = 0.5;
+		randomSpin			    = 1.0;
 		centralParticleMass     = 100; 
 		centralParticle         = false;
 		collisionDistanceFactor = 1.0;
@@ -69,7 +73,7 @@ public class ParticleInteraction {
 		spawnParticles();
 		frameCount=0;
 		startTime = System.nanoTime();
-		while(particleNum>1){
+		while(orbitNum>1){
 			startTime = System.nanoTime();
 			collideParticles();
 			calculateGrav();
@@ -147,22 +151,22 @@ public class ParticleInteraction {
         		particleArray[i]=new Particle(diskRadius,0,0,initialMass,variationMass,0,variationVel,initialSpinFactor,randomSpin,constantGravity,initialMass*particleCount);
         	}
         }
-        maxMass=-Double.MAX_VALUE;
+        systemMass=0;
     	for(int i=0; i<particleCount;i++){
-    		if (boolArray[i]&&particleArray[i].getMass()>maxMass){
-    			maxMass=particleArray[i].getMass();
-    			maxMassID=i;
-    		}
+			systemMass+=particleCount;
     	}
     }
     private void stepTime(){
-    	particleNum=0;
+    	orbitNum=particleNum;
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
 		        particleArray[i].updateVel(deltaTime);
 		        particleArray[i].updatePos(deltaTime);
 		        particleArray[i].zeroForce();
-		        particleNum++;
+		        if ((frameCount%100==0)&&(particleArray[i].getXVelocity()*particleArray[i].getXVelocity()+particleArray[i].getYVelocity()*particleArray[i].getYVelocity())>((2*constantGravity*systemMass))/Math.sqrt(particleArray[i].getXPosition()*particleArray[i].getXPosition()+particleArray[i].getYPosition()*particleArray[i].getYPosition()))
+				{
+					orbitNum--;
+				}
 			}
 		}
     }
@@ -187,7 +191,7 @@ public class ParticleInteraction {
     }
     private void printTime(){
     	
-    	System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained " + particleNum + " particles");
+    	System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained " + orbitNum + " non-escaping particles (" + particleNum + " total)");
 //		String outputFileName = ".\\"+"Simulation text frames (particleCount="+particleCount+")"+"\\"+"Computation time per frame.txt";
 //        try{
 //			File file =new File(outputFileName);
@@ -217,10 +221,11 @@ public class ParticleInteraction {
 						double rF = rT*rT*rT;
 						double fT = -constantGravity*particleArray[i].getMass()*particleArray[j].getMass()/rF;
 						particleArray[i].updateForce(rX*fT, rY*fT);
+						
 					}
 				}
 			}
-		}
+	    }
     }
     private void collideParticles(){
     	for(int i=0; i<particleCount; i++){
@@ -235,6 +240,7 @@ public class ParticleInteraction {
 	  		  			int posYJ = (int)(particleArray[j].getYPosition()*200)+400;
 	    				double minDist = Math.pow(((Math.sqrt(massI)+Math.sqrt(massJ)+1)/2)*collisionDistanceFactor,2);
 	    				if (Math.pow(posXI-posXJ,2)<=minDist && Math.pow(posYI-posYJ,2)<=minDist && Math.pow(posXI-posXJ,2)+Math.pow(posYI-posYJ,2)<=minDist){
+	    					particleNum--;
 	  		  				double massTotal = massI+massJ;
 	  		  				particleArray[i].setXVelocity(((massI*particleArray[i].getXVelocity())+(massJ*particleArray[j].getXVelocity()))/massTotal);
 	    					particleArray[i].setYVelocity(((massI*particleArray[i].getYVelocity())+(massJ*particleArray[j].getYVelocity()))/massTotal);
