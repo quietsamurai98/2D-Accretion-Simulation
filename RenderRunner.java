@@ -21,9 +21,11 @@ public class RenderRunner {
     	Scanner kb = new Scanner(System.in);
     	System.out.print("Simulation name: ");
     	String name = kb.next();
+    	System.out.print("Number of particles in the simulation: ");
+    	int particles     = kb.nextInt();
     	System.out.print("First simulation frame to render (1 to start from beginning) : ");
     	int frameStart    = kb.nextInt(); //Start at 1 to start from the very beginning
-    	System.out.print("Last simulation frame to render :");
+    	System.out.print("Last simulation frame to render : ");
     	int frameEnd      = kb.nextInt();
     	System.out.print("Render every nth simulation frame (1 to render all frames) n = ");
     	int frameSkip     = kb.nextInt(); //1=all frames are rendered, 2=half of frames are rendered, 3=third of frames are rendered, etc.
@@ -33,7 +35,7 @@ public class RenderRunner {
     	int resolutionX   = kb.nextInt();
     	System.out.print("Zoom factor (0.5 to zoom out by a factor of 2)               : ");
     	double zoom       = kb.nextDouble();
-        Render render = new Render(name, frameStart, frameEnd, frameSkip, resolutionX, resolutionY, zoom);
+        Render render = new Render(name, particles, frameStart, frameEnd, frameSkip, resolutionX, resolutionY, zoom);
         render.methodRunner();
     }
 }
