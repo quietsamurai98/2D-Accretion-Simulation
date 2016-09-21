@@ -69,9 +69,9 @@ public class ParticleInteraction {
 		System.out.print("Random variation in initial velocity (default = 0)         = ");
 		variationVel            = kb.nextDouble(); 
 		System.out.print("Random initial velocity normal to center (default = 0.5)   = ");
-		randomSpin			    = kb.nextDouble();
+		randomSpin              = kb.nextDouble();
 		System.out.print("Spin ratio (0 = all clockwise, 1 = all anti-clockwise)     = ");
-		randomSpin			    = kb.nextDouble();
+		spinRatio			    = kb.nextDouble();
 		System.out.print("Is there a central particle? (default = false)             = ");
 		centralParticle         = kb.nextBoolean();
 		if (centralParticle){
@@ -147,7 +147,7 @@ public class ParticleInteraction {
 				"variationVel            = "+ variationVel + "\r\n" +
 				"initialSpinFactor       = "+ initialSpinFactor + "\r\n" +
 				"randomSpin	             = "+ randomSpin + "\r\n" +
-				"spinRatio	             = "+ spinRatio + "\r\n" +
+				"spinRatio               = "+ spinRatio + "\r\n" +
 				"centralParticleMass     = "+ centralParticleMass + "\r\n" +
 				"centralParticle         = "+ Boolean.toString(centralParticle) + "\r\n" +
 				"collisionDistanceFactor = "+ collisionDistanceFactor
