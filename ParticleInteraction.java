@@ -39,6 +39,9 @@ public class ParticleInteraction {
 	double collisionDistanceFactor;
 	int particleNum;
 	int oldParticleNum;
+	int planets;
+	int escaping;
+	double spinRatio;
 	String name;
     public ParticleInteraction() {
 		simulate();
@@ -66,6 +69,8 @@ public class ParticleInteraction {
 		System.out.print("Random variation in initial velocity (default = 0)         = ");
 		variationVel            = kb.nextDouble(); 
 		System.out.print("Random initial velocity normal to center (default = 0.5)   = ");
+		randomSpin			    = kb.nextDouble();
+		System.out.print("Spin ratio (0 = all clockwise, 1 = all anti-clockwise)     = ");
 		randomSpin			    = kb.nextDouble();
 		System.out.print("Is there a central particle? (default = false)             = ");
 		centralParticle         = kb.nextBoolean();
@@ -141,7 +146,8 @@ public class ParticleInteraction {
 				"constantGravity         = "+ constantGravity + "\r\n" +
 				"variationVel            = "+ variationVel + "\r\n" +
 				"initialSpinFactor       = "+ initialSpinFactor + "\r\n" +
-				"randomSpin			     = "+ randomSpin + "\r\n" +
+				"randomSpin	             = "+ randomSpin + "\r\n" +
+				"spinRatio	             = "+ spinRatio + "\r\n" +
 				"centralParticleMass     = "+ centralParticleMass + "\r\n" +
 				"centralParticle         = "+ Boolean.toString(centralParticle) + "\r\n" +
 				"collisionDistanceFactor = "+ collisionDistanceFactor
@@ -152,16 +158,17 @@ public class ParticleInteraction {
     private void spawnParticles(){
     	particleArray = new Particle[particleCount];
 		boolArray = new boolean[particleCount];
+		planets = 0;
 		Arrays.fill(boolArray, Boolean.TRUE);    		
         if (centralParticle){
-        	particleArray[0]=new Particle(0,0,0,centralParticleMass,0,0,0,0,0,constantGravity,centralParticleMass);
+        	particleArray[0]=new Particle(0,0,0,centralParticleMass,0,0,0,0,0,0,constantGravity,centralParticleMass);
         	for(int i=1; i<particleCount; i++){
-        		particleArray[i]=new Particle(diskRadius,0,0,initialMass,variationMass,0,variationVel,initialSpinFactor,randomSpin,constantGravity,centralParticleMass+((particleCount-1)*initialMass*0));
+        		particleArray[i]=new Particle(diskRadius,0,0,initialMass,variationMass,0,variationVel,initialSpinFactor,randomSpin,spinRatio,constantGravity,centralParticleMass+((particleCount-1)*initialMass*0));
         	}
         }
         else{
         	for(int i=0; i<particleCount; i++){
-        		particleArray[i]=new Particle(diskRadius,0,0,initialMass,variationMass,0,variationVel,initialSpinFactor,randomSpin,constantGravity,initialMass*particleCount);
+        		particleArray[i]=new Particle(diskRadius,0,0,initialMass,variationMass,0,variationVel,initialSpinFactor,randomSpin,spinRatio,constantGravity,initialMass*particleCount);
         	}
         }
         maxMass=-Double.MAX_VALUE;
@@ -202,8 +209,11 @@ public class ParticleInteraction {
         output.close();
     }
     private void printTime(){
-    	if (oldParticleNum!=particleNum)
-    		System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained " + particleNum + " particles");
+    	if (oldParticleNum!=particleNum){
+    		System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained... ");
+    		System.out.println("     "+particleNum+" particles total");
+    		System.out.println("     "+planets+" planets");//, of which "+escaping+" are escaping");
+    	}
     }
     private void calculateGrav(){
     	for(int i=0; i<particleCount; i++){
@@ -222,6 +232,8 @@ public class ParticleInteraction {
 		}
     }
     private void collideParticles(){
+    	escaping=0;
+    	planets=0;
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
 	    		for(int j=0; j<particleCount; j++){
@@ -247,6 +259,11 @@ public class ParticleInteraction {
 						}
 					}
 				}
+			}
+			if (particleArray[i].getMass()>(initialMass+variationMass)*5){
+				planets++; //Bodies consisting of 2+ particles
+//				if (particleArray[i].getXVelocity()*particleArray[i].getXVelocity()+particleArray[i].getYVelocity()*particleArray[i].getYVelocity() > initialMass*particleCount*constantGravity*2/Math.sqrt(particleArray[i].getXPosition()*particleArray[i].getXPosition()+particleArray[i].getYPosition()*particleArray[i].getYPosition()))
+//					escaping++;
 			}
 		}
     }

@@ -31,7 +31,7 @@ public class Particle {
 		mass=0.0;
 		distToCenter=0.0;
 	}
-    public Particle(double diskRadius, double diskCenterX, double diskCenterY, double initialMass, double varyMass, double vel, double varyVel, double spinFactor, double varySpin, double constantGravity, double baryMass) {
+    public Particle(double diskRadius, double diskCenterX, double diskCenterY, double initialMass, double varyMass, double vel, double varyVel, double spinFactor, double varySpin, double spinRatio, double constantGravity, double baryMass) {
     	Random randGen = new Random();
     	xPosition=diskCenterX;
 		yPosition=diskCenterY;
@@ -42,7 +42,8 @@ public class Particle {
 		randSpin=varySpin;
 		mass=initialMass+((Math.random()*2.0-1.0)*varyMass);
 		if (!(diskRadius==0.0)){
-			double rad = Math.sqrt(randGen.nextDouble()*diskRadius)/(Math.sqrt(2)/2);
+			//double rad = randGen.nextGaussian()*diskRadius/2;
+			double rad = Math.sqrt(randGen.nextDouble()*diskRadius*diskRadius);
 			double theta=randGen.nextDouble()*Math.PI*2;
 			
 			double xOffset=rad*Math.cos(theta);
@@ -54,7 +55,7 @@ public class Particle {
 			xVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
 			yVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
 			
-			if (Math.random()<0.5){
+			if (Math.random()<spinRatio){
 				rad = randGen.nextGaussian()-randSpin;
 			}else{
 				rad = randGen.nextGaussian()+randSpin;	

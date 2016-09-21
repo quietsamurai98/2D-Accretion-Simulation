@@ -38,19 +38,22 @@ public class Render {
 	String directoryImageNameString;
 	int particleCount;
 	int trailLength;
+	double minMass;
 	int frameEnd;
 	int frameStart;
 	int frameSkip;
 	int picCount;
+	Color[] colors;
 	double zoom;
 	long startTime, elapsedTime;
 	
-    public Render(String name, int particles, int lengthMultiplier, int frameStartConstruct, int frameEndConstruct, int frameSkipConstruct, int resolutionX, int resolutionY, double zoomFactor) {
+    public Render(String name, int particles, int lengthMultiplier, double min, int frameStartConstruct, int frameEndConstruct, int frameSkipConstruct, int resolutionX, int resolutionY, double zoomFactor) {
     	directoryTextString = ".\\"+name+" text frames"+"\\";
     	directoryImageString = ".\\"+name+" image frames"+"\\";
     	directoryImageNameString = name+" image frames";
     	particleCount = particles;
     	trailLength   = lengthMultiplier;
+    	minMass		  = min;
     	frameStart    = frameStartConstruct;
     	frameEnd      = frameEndConstruct;
     	frameSkip     = frameSkipConstruct;
@@ -70,6 +73,10 @@ public class Render {
 		y = new double[particleCount];
 		yOld = new double[particleCount];
 		m = new double[particleCount];
+		colors = new Color[particleCount];
+		for(int i = 0;i<particleCount;i++){
+			colors[i] = new Color((int)(Math.random()*256),(int)(Math.random()*256),(int)(Math.random()*256));
+		}
 		x[0]=0;
 		for(int frameCount=frameStart;frameCount<=frameEnd;frameCount+=frameSkip){
     		startTime=System.nanoTime();
@@ -183,19 +190,18 @@ public class Render {
 						R=Math.max(0,R);
 						G=Math.max(0,G);
 						B=Math.max(0,B);
-						Color c = new Color(R, G, B, A);
+						Color c = new Color(B, G, R, A);
 						trailImage.setRGB(i, j, c.getRGB());
 					}
 				}
 			}
 		}
 			
-		
-		
-		trailGraphics.setColor(new Color(127,127,127));
 		for(int i = 0; i<length; i++){
-			if (x[i]<10000)
+			if (x[i]<10000 && m[i]>minMass){
+				trailGraphics.setColor(colors[i]);
 				trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
+			}
 		}
 	}
 	private void saveImage(int frameCount){

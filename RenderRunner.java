@@ -37,7 +37,9 @@ public class RenderRunner {
     	double zoom             = kb.nextDouble();
     	System.out.print("Trail length multiplier (2 to double trail length, 0 to disable): ");
     	int lengthMultiplier = Math.max((int)kb.nextDouble(),0);
-        Render render = new Render(name, particles, lengthMultiplier, frameStart, frameEnd, frameSkip, resolutionX, resolutionY, zoom);
+    	System.out.print("Minimum mass to draw trails (0 to show all trails) : ");
+    	double minMass             = kb.nextDouble();
+        Render render = new Render(name, particles, lengthMultiplier, minMass, frameStart, frameEnd, frameSkip, resolutionX, resolutionY, zoom);
         render.methodRunner();
     }
 }
