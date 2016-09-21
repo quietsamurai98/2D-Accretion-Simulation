@@ -38,6 +38,7 @@ public class ParticleInteraction {
 	long startTime, elapsedTime;
 	double collisionDistanceFactor;
 	int particleNum;
+	int oldParticleNum;
 	String name;
     public ParticleInteraction() {
 		simulate();
@@ -172,6 +173,7 @@ public class ParticleInteraction {
     	}
     }
     private void stepTime(){
+    	oldParticleNum=particleNum;
     	particleNum=0;
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
@@ -200,25 +202,8 @@ public class ParticleInteraction {
         output.close();
     }
     private void printTime(){
-    	
-    	System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained " + particleNum + " particles");
-//		String outputFileName = ".\\"+"Simulation text frames (particleCount="+particleCount+")"+"\\"+"Computation time per frame.txt";
-//        try{
-//			File file =new File(outputFileName);
-//			if(!file.exists()){
-//			file.createNewFile();
-//			}
-//			FileWriter fw = new FileWriter(file,true);
-//			BufferedWriter bw = new BufferedWriter(fw);
-//			bw.write(String.format("%014d", elapsedTime)+"\r\n");
-//			bw.close();
-//			
-//			}catch(IOException ioe){
-//			System.out.println("Exception occurred:");
-//			ioe.printStackTrace();
-//       }
-		
-		
+    	if (oldParticleNum!=particleNum)
+    		System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained " + particleNum + " particles");
     }
     private void calculateGrav(){
     	for(int i=0; i<particleCount; i++){
@@ -247,7 +232,7 @@ public class ParticleInteraction {
 	  		  			int posYI = (int)(particleArray[i].getYPosition()*200)+400;
 	  		  			int posXJ = (int)(particleArray[j].getXPosition()*200)+400;
 	  		  			int posYJ = (int)(particleArray[j].getYPosition()*200)+400;
-	    				double minDist = Math.pow(((Math.cbrt(massI)+Math.cbrt(massJ)+1)/2)*collisionDistanceFactor,2);
+	    				double minDist = Math.pow(((Math.sqrt(massI)+Math.sqrt(massJ)+1)/2)*collisionDistanceFactor,2);
 	    				if (Math.pow(posXI-posXJ,2)<=minDist && Math.pow(posYI-posYJ,2)<=minDist && Math.pow(posXI-posXJ,2)+Math.pow(posYI-posYJ,2)<=minDist){
 	  		  				double massTotal = massI+massJ;
 	  		  				particleArray[i].setXVelocity(((massI*particleArray[i].getXVelocity())+(massJ*particleArray[j].getXVelocity()))/massTotal);
