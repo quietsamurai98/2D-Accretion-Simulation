@@ -201,6 +201,8 @@ public class Render {
 			if (x[i]<10000 && m[i]>minMass){
 				trailGraphics.setColor(colors[i]);
 				trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
+				trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2)+1,(((y[i]-centerY)*200*zoom)+imageSizeY/2)+1,(((xOld[i]-centerX)*200*zoom)+imageSizeX/2)+1,(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)+1));
+				trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2)-1,(((y[i]-centerY)*200*zoom)+imageSizeY/2)-1,(((xOld[i]-centerX)*200*zoom)+imageSizeX/2)-1,(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)-1));
 			}
 		}
 	}

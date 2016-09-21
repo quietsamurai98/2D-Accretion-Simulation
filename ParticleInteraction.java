@@ -28,7 +28,7 @@ public class ParticleInteraction {
    	double initialSpinFactor;
    	double variationSpin;
    	double centralParticleMass;
-   	boolean centralParticle;
+   	boolean centralParticle=false;
    	double randomSpin;
    	double centerX=0;
    	double centerY=0;
@@ -36,7 +36,7 @@ public class ParticleInteraction {
    	double maxMass;
 	int frameCount;
 	long startTime, elapsedTime;
-	double collisionDistanceFactor;
+	double collisionDistanceFactor=1;
 	int particleNum;
 	int oldParticleNum;
 	int planets;
@@ -72,14 +72,14 @@ public class ParticleInteraction {
 		randomSpin              = kb.nextDouble();
 		System.out.print("Spin ratio (0 = all clockwise, 1 = all anti-clockwise)     = ");
 		spinRatio			    = kb.nextDouble();
-		System.out.print("Is there a central particle? (default = false)             = ");
-		centralParticle         = kb.nextBoolean();
-		if (centralParticle){
-			System.out.print("Mass of the central particle (default = 100)                   = ");
-			centralParticleMass     = kb.nextDouble(); 
-		}
-		System.out.print("Collision Distance Factor (default = 1.0)                  = ");
-		collisionDistanceFactor = kb.nextDouble();
+//		System.out.print("Is there a central particle? (default = false)             = ");
+//		centralParticle         = kb.nextBoolean();
+//		if (centralParticle){
+//			System.out.print("Mass of the central particle (default = 100)                   = ");
+//			centralParticleMass     = kb.nextDouble(); 
+//		}
+//		System.out.print("Collision Distance Factor (default = 1.0)                  = ");
+//		collisionDistanceFactor = kb.nextDouble();
 		
 		particleNum             = particleCount;
     } 
@@ -147,10 +147,10 @@ public class ParticleInteraction {
 				"variationVel            = "+ variationVel + "\r\n" +
 				"initialSpinFactor       = "+ initialSpinFactor + "\r\n" +
 				"randomSpin	             = "+ randomSpin + "\r\n" +
-				"spinRatio               = "+ spinRatio + "\r\n" +
-				"centralParticleMass     = "+ centralParticleMass + "\r\n" +
-				"centralParticle         = "+ Boolean.toString(centralParticle) + "\r\n" +
-				"collisionDistanceFactor = "+ collisionDistanceFactor
+				"spinRatio               = "+ spinRatio + "\r\n"
+//				"centralParticleMass     = "+ centralParticleMass + "\r\n" +
+//				"centralParticle         = "+ Boolean.toString(centralParticle) + "\r\n" +
+//				"collisionDistanceFactor = "+ collisionDistanceFactor
         	
         	);
         output.close();
@@ -260,7 +260,7 @@ public class ParticleInteraction {
 					}
 				}
 			}
-			if (particleArray[i].getMass()>(initialMass+variationMass)*5){
+			if (particleArray[i].getMass()>(initialMass)*2){
 				planets++; //Bodies consisting of 2+ particles
 //				if (particleArray[i].getXVelocity()*particleArray[i].getXVelocity()+particleArray[i].getYVelocity()*particleArray[i].getYVelocity() > initialMass*particleCount*constantGravity*2/Math.sqrt(particleArray[i].getXPosition()*particleArray[i].getXPosition()+particleArray[i].getYPosition()*particleArray[i].getYPosition()))
 //					escaping++;
