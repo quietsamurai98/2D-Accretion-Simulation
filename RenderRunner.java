@@ -35,8 +35,8 @@ public class RenderRunner {
     	int resolutionX         = kb.nextInt();
     	System.out.print("Zoom factor (0.5 to zoom out by a factor of 2): ");
     	double zoom             = kb.nextDouble();
-    	System.out.print("Trail length multiplier (2 to double trail length): ");
-    	int lengthMultiplier = (int)kb.nextDouble();
+    	System.out.print("Trail length multiplier (2 to double trail length, 0 to disable): ");
+    	int lengthMultiplier = Math.max((int)kb.nextDouble(),0);
         Render render = new Render(name, particles, lengthMultiplier, frameStart, frameEnd, frameSkip, resolutionX, resolutionY, zoom);
         render.methodRunner();
     }

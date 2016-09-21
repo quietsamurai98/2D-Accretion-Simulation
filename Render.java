@@ -77,7 +77,8 @@ public class Render {
 	    	readTextFile(frameCount);
 	    	focus();
 	    	drawParticles();
-	    	drawTrails();
+	    	if (trailLength!=0)
+	    		drawTrails();
 	    	saveImage(frameCount);
 	    	elapsedTime=System.nanoTime()-startTime;
 	    	System.out.println("Image "+picCount+" (Frame " + frameCount + ") saved (took " + String.format("%014d", elapsedTime) + " nanoseconds)");
