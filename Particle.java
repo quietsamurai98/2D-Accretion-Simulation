@@ -5,7 +5,7 @@
  * @author 
  * @version 1.00 2016/8/24
  */
-
+import java.util.*;
 
 public class Particle {
 	private double xPosition;
@@ -18,6 +18,7 @@ public class Particle {
 	private double yForce;
 	private double mass;
 	private double distToCenter;
+	private double randSpin;
 	public Particle() {
     	xPosition=0.0;
 		yPosition=0.0;
@@ -31,28 +32,36 @@ public class Particle {
 		distToCenter=0.0;
 	}
     public Particle(double diskRadius, double diskCenterX, double diskCenterY, double initialMass, double varyMass, double vel, double varyVel, double spinFactor, double varySpin, double constantGravity, double baryMass) {
+    	Random randGen = new Random();
     	xPosition=diskCenterX;
 		yPosition=diskCenterY;
 		xAcceleration=0.0;
 		yAcceleration=0.0;
 		xForce=0.0;
 		yForce=0.0;
+		randSpin=varySpin;
 		mass=initialMass+((Math.random()*2.0-1.0)*varyMass);
 		if (!(diskRadius==0.0)){
-			double xOffset=(Math.random()*2.0-1.0)*diskRadius;
-			double yOffset=(Math.random()*2.0-1.0)*diskRadius;
-			distToCenter=Math.sqrt((xPosition-diskCenterX+xOffset)*(xPosition-diskCenterX+xOffset)+(yPosition-diskCenterY+yOffset)*(yPosition-diskCenterY+yOffset));
-			while (distToCenter>diskRadius){
-				xOffset=(Math.random()*2.0-1.0)*diskRadius;
-				yOffset=(Math.random()*2.0-1.0)*diskRadius;
-				distToCenter=Math.sqrt((xPosition-diskCenterX+xOffset)*(xPosition-diskCenterX+xOffset)+(yPosition-diskCenterY+yOffset)*(yPosition-diskCenterY+yOffset));
-			}
+			double rad = Math.sqrt(randGen.nextDouble()*diskRadius)/(Math.sqrt(2)/2);
+			double theta=randGen.nextDouble()*Math.PI*2;
+			
+			double xOffset=rad*Math.cos(theta);
+			double yOffset=rad*Math.sin(theta);
 			xPosition+=xOffset;
 			yPosition+=yOffset;
 			distToCenter=Math.sqrt((xPosition-diskCenterX)*(xPosition-diskCenterX)+(yPosition-diskCenterY)*(yPosition-diskCenterY));
 			double spin=Math.sqrt((constantGravity*baryMass)/distToCenter)*spinFactor;
-			xVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((yPosition-diskCenterY)/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
-			yVelocity=vel+((Math.random()*2.0-1.0)*varyVel)+((0.0-(xPosition-diskCenterX))/distToCenter)*(spin+((Math.random()*2.0-1.0)*varySpin));
+			xVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
+			yVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
+			
+			if (Math.random()<0.5){
+				rad = randGen.nextGaussian()-randSpin;
+			}else{
+				rad = randGen.nextGaussian()+randSpin;	
+			}
+			theta=Math.atan2(yPosition,xPosition) + 0.5*Math.PI;
+			xVelocity=+rad*Math.cos(theta);
+			yVelocity=rad*Math.sin(theta);
 		}
     }
     public double getXPosition(){
@@ -117,8 +126,16 @@ public class Particle {
 	    xPosition += xVelocity*deltaTime;
         yPosition += yVelocity*deltaTime;
     }
-    public void updateForceXY(double angle, double forceTotal){
-    	xForce -= Math.cos(angle)*forceTotal;
-        yForce -= Math.sin(angle)*forceTotal;
+    public void updateForce(double xF, double yF){
+    	xForce += xF;
+    	yForce += yF;
+    }
+    public void zeroForce(){
+    	xForce = 0;
+    	yForce = 0;
+    }
+    public String toString(){
+    	String out = xPosition + " " + yPosition + " " + mass;
+    	return out;
     }
 }
