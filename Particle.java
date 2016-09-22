@@ -19,6 +19,7 @@ public class Particle {
 	private double mass;
 	private double distToCenter;
 	private double randSpin;
+	private double radius;
 	public Particle() {
     	xPosition=0.0;
 		yPosition=0.0;
@@ -92,6 +93,9 @@ public class Particle {
 	public double getMass(){
     	return mass;
     }
+    public double getRadius(){
+    	return radius;
+    }
 	public void setXPosition(double newXPosition){
     	xPosition=newXPosition;
     }
@@ -118,6 +122,7 @@ public class Particle {
     }
 	public void setMass(double newMass){
     	mass=newMass;
+    	radius=Math.sqrt(mass);
     }
     public void updateVel(double deltaTime){
         xVelocity += (xForce*deltaTime)/mass;

@@ -218,13 +218,16 @@ public class ParticleInteraction {
     private void calculateGrav(){
     	for(int i=0; i<particleCount; i++){
 			if (boolArray[i]){
+				double iX = particleArray[i].getXPosition();
+				double iY = particleArray[i].getYPosition();
+				double iM = particleArray[i].getMass();
 				for(int j=0; j<particleCount; j++){
 					if(i!=j&&boolArray[j]){
-						double rX = particleArray[i].getXPosition()-particleArray[j].getXPosition();
-						double rY = particleArray[i].getYPosition()-particleArray[j].getYPosition();
+						double rX = iX-particleArray[j].getXPosition();
+						double rY = iY-particleArray[j].getYPosition();
 						double rT = Math.sqrt(rX*rX+rY*rY);
 						double rF = rT*rT*rT;
-						double fT = -constantGravity*particleArray[i].getMass()*particleArray[j].getMass()/rF;
+						double fT = -constantGravity*iM*particleArray[j].getMass()/rF;
 						particleArray[i].updateForce(rX*fT, rY*fT);
 					}
 				}
@@ -238,24 +241,31 @@ public class ParticleInteraction {
 			if (boolArray[i]){
 	    		for(int j=0; j<particleCount; j++){
 	    			if(boolArray[j]&&i!=j){
-	    				double massI   = particleArray[i].getMass();
-	  		  			double massJ   = particleArray[j].getMass();
-	  		  			int posXI = (int)(particleArray[i].getXPosition()*200)+400;
-	  		  			int posYI = (int)(particleArray[i].getYPosition()*200)+400;
-	  		  			int posXJ = (int)(particleArray[j].getXPosition()*200)+400;
-	  		  			int posYJ = (int)(particleArray[j].getYPosition()*200)+400;
-	    				double minDist = Math.pow(((Math.sqrt(massI)+Math.sqrt(massJ)+1)/2)*collisionDistanceFactor,2);
-	    				if (Math.pow(posXI-posXJ,2)<=minDist && Math.pow(posYI-posYJ,2)<=minDist && Math.pow(posXI-posXJ,2)+Math.pow(posYI-posYJ,2)<=minDist){
-	  		  				double massTotal = massI+massJ;
-	  		  				particleArray[i].setXVelocity(((massI*particleArray[i].getXVelocity())+(massJ*particleArray[j].getXVelocity()))/massTotal);
-	    					particleArray[i].setYVelocity(((massI*particleArray[i].getYVelocity())+(massJ*particleArray[j].getYVelocity()))/massTotal);
-	    					particleArray[i].setXPosition(((massI*particleArray[i].getXPosition())+(massJ*particleArray[j].getXPosition()))/massTotal);
-	    					particleArray[i].setYPosition(((massI*particleArray[i].getYPosition())+(massJ*particleArray[j].getYPosition()))/massTotal);
-	    					particleArray[i].setMass(massTotal);
-							particleArray[j].setXPosition(10001);
-							particleArray[j].setYPosition(10001);
-							particleArray[j].setMass(0);
-							boolArray[j]=false;
+	  		  			double radiusI   = particleArray[i].getRadius();
+	  		  			double radiusJ   = particleArray[j].getRadius();
+	  		  			double posXI     = (particleArray[i].getXPosition()*200)+400;
+	  		  			double posYI     = (particleArray[i].getYPosition()*200)+400;
+	  		  			double posXJ     = (particleArray[j].getXPosition()*200)+400;
+	  		  			double posYJ     = (particleArray[j].getYPosition()*200)+400;
+	    				double minDist = ((radiusI+radiusJ+1)/2)*collisionDistanceFactor;
+	    				minDist *= minDist;
+	    				if (
+	    					(posXI-posXJ)*(posXI-posXJ)<=minDist && 
+	    					(posYI-posYJ)*(posYI-posYJ)<=minDist && 
+	    					(posXI-posXJ)*(posXI-posXJ)+(posYI-posYJ)*(posYI-posYJ)<=minDist
+	    					){
+	    						double massI   = particleArray[i].getMass();
+	  		  					double massJ   = particleArray[j].getMass();
+		  		  				double massTotal = massI+massJ;
+		  		  				particleArray[i].setXVelocity(((massI*particleArray[i].getXVelocity())+(massJ*particleArray[j].getXVelocity()))/massTotal);
+		    					particleArray[i].setYVelocity(((massI*particleArray[i].getYVelocity())+(massJ*particleArray[j].getYVelocity()))/massTotal);
+		    					particleArray[i].setXPosition(((massI*particleArray[i].getXPosition())+(massJ*particleArray[j].getXPosition()))/massTotal);
+		    					particleArray[i].setYPosition(((massI*particleArray[i].getYPosition())+(massJ*particleArray[j].getYPosition()))/massTotal);
+		    					particleArray[i].setMass(massTotal);
+								particleArray[j].setXPosition(10001);
+								particleArray[j].setYPosition(10001);
+								particleArray[j].setMass(0);
+								boolArray[j]=false;
 						}
 					}
 				}

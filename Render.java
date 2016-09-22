@@ -64,7 +64,7 @@ public class Render {
     }
     public void methodRunner(){
     	picCount=0;
-    	trailImage = new BufferedImage(imageSizeX, imageSizeY, BufferedImage.TYPE_INT_RGB );
+    	trailImage = new BufferedImage(imageSizeX, imageSizeY, BufferedImage.TYPE_INT_ARGB );
     	trailGraphics = trailImage.createGraphics();
     	trailGraphics.setColor(Color.black);
     	trailGraphics.fillRect(0,0,imageSizeX,imageSizeY);
@@ -75,7 +75,7 @@ public class Render {
 		m = new double[particleCount];
 		colors = new Color[particleCount];
 		for(int i = 0;i<particleCount;i++){
-			colors[i] = new Color((int)(Math.random()*256),(int)(Math.random()*256),(int)(Math.random()*256));
+			colors[i] = new Color((int)(Math.random()*256),(int)(Math.random()*256),(int)(Math.random()*256),128);
 		}
 		x[0]=0;
 		for(int frameCount=frameStart;frameCount<=frameEnd;frameCount+=frameSkip){
@@ -167,7 +167,7 @@ public class Render {
     	for(int i=0; i<length; i++){
 			int dispX = (int)(((x[i]-centerX)*200*zoom)+imageSizeX/2);
 			int dispY = (int)(((y[i]-centerY)*200*zoom)+imageSizeY/2);
-			int radius = (int)((Math.sqrt(m[i])+0.5)/2*zoom);
+			int radius = (int)((Math.sqrt(m[i]))/2*zoom);
 			for (int j = dispX-radius; j <= dispX+radius;j++){
 				for (int k = dispY-radius; k <= dispY+radius;k++){
 					if((j<imageSizeX)&&(k<imageSizeY)&&(j>0)&&(k>0)){
