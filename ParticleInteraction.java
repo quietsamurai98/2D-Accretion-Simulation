@@ -2,7 +2,7 @@
  * @(#)ParticleInteraction.java
  *
  *
- * @author 
+ * @author
  * @version 1.00 2016/8/24
  */
 import java.lang.*;
@@ -10,12 +10,12 @@ import java.util.*;
 import java.util.Scanner;
 import java.io.*;
 public class ParticleInteraction {
-        
+
     /**
      * Creates a new instance of <code>ParticleInteraction</code>.
      */
-    
-    
+
+
     Particle[] particleArray = new Particle[0];
 	boolean[] boolArray = new boolean[0];
     int particleCount;
@@ -27,7 +27,7 @@ public class ParticleInteraction {
    	double variationVel;
    	double initialSpinFactor;
    	double variationSpin;
-   	double centralParticleMass;
+	double centralParticleMass;
    	boolean centralParticle=false;
    	double randomSpin;
    	double centerX=0;
@@ -41,52 +41,29 @@ public class ParticleInteraction {
 	int oldParticleNum;
 	int planets;
 	int escaping;
+	int frameCap;
 	double spinRatio;
 	String name;
 	BufferedWriter dataBW;
 	int lastCollisionFrame;
-	
-    public ParticleInteraction() {
-		simulate();
+
+    public ParticleInteraction(String nameConstructor, int particleCountConstructor, int frameCapConstructor, double initialMassConstructor, double variationMassConstructor, double diskRadiusConstructor, double randomSpinConstructor, double spinRatioConstructor, double variationVelConstructor, double deltaTimeConstructor, double constantGravityConstructor) {
+		simulate(nameConstructor, particleCountConstructor, frameCapConstructor, initialMassConstructor, variationMassConstructor, diskRadiusConstructor, randomSpinConstructor, spinRatioConstructor, variationVelConstructor, deltaTimeConstructor, constantGravityConstructor);
     }
-    
+
     /**
      * @param args the command line arguments
-     */    
-     private void updateVars(){
-     	Scanner kb = new Scanner(System.in);
-     	System.out.print("Simulation name                                            : ");
-		name           = kb.next(); 
-     	System.out.print("Number of initial particles (default = 1000)               = ");
-		particleCount           = kb.nextInt(); 
-		System.out.print("Initial particle mass (default = 10.0)                     = ");
-		initialMass             = kb.nextDouble(); 
-		System.out.print("Variation in initial particle mass (default = 5.0)         = ");	
-		variationMass           = kb.nextDouble(); 
-		System.out.print("Radius of the initial disk (default = 2.0)                 = ");
-		diskRadius              = kb.nextDouble(); 
-		System.out.print("Size of simulation timestep (default = 0.001)              = ");
-		deltaTime               = kb.nextDouble(); 
-		System.out.print("Gravitational Constant (default = 0.001)                   = ");
-		constantGravity         = kb.nextDouble(); 
-		System.out.print("Random variation in initial velocity (default = 0)         = ");
-		variationVel            = kb.nextDouble(); 
-		System.out.print("Random initial velocity normal to center (default = 0.5)   = ");
-		randomSpin              = kb.nextDouble();
-		System.out.print("Spin ratio (0 = all clockwise, 1 = all anti-clockwise)     = ");
-		spinRatio			    = kb.nextDouble();
-		
-		particleNum             = particleCount;
-    } 
-    	
-    	
-    public void simulate(){
-		updateVars();
+     */
+
+
+
+    public void simulate(String nameConstructor, int particleCountConstructor, int frameCapConstructor, double initialMassConstructor, double variationMassConstructor, double diskRadiusConstructor, double randomSpinConstructor, double spinRatioConstructor, double variationVelConstructor, double deltaTimeConstructor, double constantGravityConstructor){
+		updateVars(nameConstructor, particleCountConstructor, frameCapConstructor, initialMassConstructor, variationMassConstructor, diskRadiusConstructor, randomSpinConstructor, spinRatioConstructor, variationVelConstructor, deltaTimeConstructor, constantGravityConstructor);
 		createDirectory();
 		spawnParticles();
 		frameCount=0;
 		lastCollisionFrame=0;
-		while(frameCount-lastCollisionFrame<50000){
+		while(frameCount-lastCollisionFrame<frameCap){
 			startTime = System.nanoTime();
 			collideParticles();
 			calculateGrav();
@@ -95,7 +72,7 @@ public class ParticleInteraction {
 			elapsedTime=System.nanoTime()-startTime;
 			saveText();
 	        printTime();
-			
+
 		}
     }
 
@@ -103,21 +80,21 @@ public class ParticleInteraction {
     	File directory = new File(name);
 		if (!directory.exists()) {
 		    boolean result = false;
-		
+
 		    try{
 		        directory.mkdir();
 		        result = true;
-		    } 
+		    }
 		    catch(SecurityException se){
 		        se.printStackTrace();
-		    }        
+		    }
 		    if(result) {
 		    }
 		}else{
 			//if the directory exists, delete all existing images
 			System.out.println("Clearing directory");
-			for(File file: directory.listFiles()) 
-    			if (!file.isDirectory()) 
+			for(File file: directory.listFiles())
+    			if (!file.isDirectory())
         	file.delete();
         	System.out.println("Directory cleared!");
 		}
@@ -131,9 +108,9 @@ public class ParticleInteraction {
         	System.out.println("File "+outputFileName+" not found.");
         	ex.printStackTrace();
         }
-        
+
         output.println(
-        	
+
 				"particleCount           = "+ particleCount + "\r\n" +
 				"initialMass             = "+ initialMass + "\r\n" +
 				"variationMass           = "+ variationMass + "\r\n" +
@@ -147,7 +124,7 @@ public class ParticleInteraction {
 //				"centralParticleMass     = "+ centralParticleMass + "\r\n" +
 //				"centralParticle         = "+ Boolean.toString(centralParticle) + "\r\n" +
 //				"collisionDistanceFactor = "+ collisionDistanceFactor
-        	
+
         	);
         output.close();
         try {
@@ -167,7 +144,7 @@ public class ParticleInteraction {
     	particleArray = new Particle[particleCount];
 		boolArray = new boolean[particleCount];
 		planets = 0;
-		Arrays.fill(boolArray, Boolean.TRUE);    		
+		Arrays.fill(boolArray, Boolean.TRUE);
         if (centralParticle){
         	particleArray[0]=new Particle(0,0,0,centralParticleMass,0,0,0,0,0,0,constantGravity,centralParticleMass);
         	for(int i=1; i<particleCount; i++){
@@ -200,10 +177,10 @@ public class ParticleInteraction {
 		}
     }
     private void saveText(){
-		
+
 
         String out = "";
-        
+
         try{
         	for(int i=0;i<particleCount;i++){
         		if (boolArray[i]){
@@ -211,7 +188,7 @@ public class ParticleInteraction {
         		} else {
         			dataBW.write("SKIP ");
         		}
-        		
+
         	}
     		dataBW.write("\n");
     		dataBW.flush();
@@ -263,8 +240,8 @@ public class ParticleInteraction {
 	    				double minDist = ((radiusI+radiusJ+1)/2)*collisionDistanceFactor;
 	    				minDist *= minDist;
 	    				if (
-	    					(posXI-posXJ)*(posXI-posXJ)<=minDist && 
-	    					(posYI-posYJ)*(posYI-posYJ)<=minDist && 
+	    					(posXI-posXJ)*(posXI-posXJ)<=minDist &&
+	    					(posYI-posYJ)*(posYI-posYJ)<=minDist &&
 	    					(posXI-posXJ)*(posXI-posXJ)+(posYI-posYJ)*(posYI-posYJ)<=minDist
 	    					){
 	    						double massI   = particleArray[i].getMass();
@@ -285,9 +262,24 @@ public class ParticleInteraction {
 			}
 			if (particleArray[i].getMass()>(initialMass)*2){
 				planets++; //Bodies consisting of 2+ particles
-//				if (particleArray[i].getXVelocity()*particleArray[i].getXVelocity()+particleArray[i].getYVelocity()*particleArray[i].getYVelocity() > initialMass*particleCount*constantGravity*2/Math.sqrt(particleArray[i].getXPosition()*particleArray[i].getXPosition()+particleArray[i].getYPosition()*particleArray[i].getYPosition()))
-//					escaping++;
+				if (particleArray[i].getXVelocity()*particleArray[i].getXVelocity()+particleArray[i].getYVelocity()*particleArray[i].getYVelocity() > initialMass*particleCount*constantGravity*2/Math.sqrt(particleArray[i].getXPosition()*particleArray[i].getXPosition()+particleArray[i].getYPosition()*particleArray[i].getYPosition()))
+					escaping++;
 			}
 		}
     }
+    private void updateVars(String nameConstructor, int particleCountConstructor, int frameCapConstructor, double initialMassConstructor, double variationMassConstructor, double diskRadiusConstructor, double randomSpinConstructor, double spinRatioConstructor, double variationVelConstructor, double deltaTimeConstructor, double constantGravityConstructor){
+    	name = nameConstructor;
+    	particleCount = particleCountConstructor;
+    	frameCap = frameCapConstructor;
+    	initialMass = initialMassConstructor;
+    	variationMass = variationMassConstructor;
+    	diskRadius = diskRadiusConstructor;
+    	randomSpin = randomSpinConstructor;
+    	spinRatio = spinRatioConstructor;
+    	variationVel = variationVelConstructor;
+    	deltaTime = deltaTimeConstructor;
+    	constantGravity = constantGravityConstructor;
+		particleNum = particleCount;
+    }
+
 }

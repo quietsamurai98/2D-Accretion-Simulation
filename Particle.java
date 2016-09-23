@@ -2,7 +2,7 @@
  * @(#)Particle.java
  *
  *
- * @author 
+ * @author
  * @version 1.00 2016/8/24
  */
 import java.util.*;
@@ -47,7 +47,7 @@ public class Particle {
 			double radDist = Math.sqrt(randGen.nextDouble()*diskRadius*diskRadius);
 			radDist *= Math.sqrt(radDist/diskRadius);
 			double theta=randGen.nextDouble()*Math.PI*2;
-			
+
 			double xOffset=radDist*Math.cos(theta);
 			double yOffset=radDist*Math.sin(theta);
 			xPosition+=xOffset;
@@ -60,7 +60,7 @@ public class Particle {
 			if (Math.random()<spinRatio){
 				rad = (randGen.nextGaussian()-randSpin)*Math.sqrt(radDist/diskRadius);
 			}else{
-				rad = (randGen.nextGaussian()+randSpin)*Math.sqrt(radDist/diskRadius);	
+				rad = (randGen.nextGaussian()+randSpin)*Math.sqrt(radDist/diskRadius);
 			}
 			theta=Math.atan2(yPosition,xPosition) + 0.5*Math.PI;
 			xVelocity=+rad*Math.cos(theta);
@@ -142,7 +142,7 @@ public class Particle {
     	yForce = 0;
     }
     public String toString(){
-    	String out = xPosition + " " + yPosition + " " + mass;
+    	String out = (int)((xPosition+0.0005)*1000)/1000.0 + " " + (int)((yPosition+0.0005)*1000)/1000.0 + " " + (int)((mass+0.0005)*1000)/1000.0;
     	return out;
     }
 }
