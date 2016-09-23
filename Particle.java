@@ -64,7 +64,7 @@ public class Particle {
 			}
 			theta=Math.atan2(yPosition,xPosition) + 0.5*Math.PI;
 			xVelocity=+rad*Math.cos(theta);
-			yVelocity=rad*Math.sin(theta);
+			yVelocity=+rad*Math.sin(theta);
 		}
     }
     public double getXPosition(){
