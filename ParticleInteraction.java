@@ -44,6 +44,8 @@ public class ParticleInteraction {
 	double spinRatio;
 	String name;
 	BufferedWriter dataBW;
+	int lastCollisionFrame;
+	
     public ParticleInteraction() {
 		simulate();
     }
@@ -83,8 +85,8 @@ public class ParticleInteraction {
 		createDirectory();
 		spawnParticles();
 		frameCount=0;
-		startTime = System.nanoTime();
-		while(particleNum>1){
+		lastCollisionFrame=0;
+		while(frameCount-lastCollisionFrame<50000){
 			startTime = System.nanoTime();
 			collideParticles();
 			calculateGrav();
@@ -220,6 +222,7 @@ public class ParticleInteraction {
     }
     private void printTime(){
     	if (oldParticleNum!=particleNum){
+    		lastCollisionFrame=frameCount;
     		System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained... ");
     		System.out.println("     "+particleNum+" particles total");
     		System.out.println("     "+planets + " planets");//, of which "+escaping+" are escaping");
