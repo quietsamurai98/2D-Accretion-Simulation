@@ -44,22 +44,23 @@ public class Particle {
 		mass=initialMass+((Math.random()*2.0-1.0)*varyMass);
 		if (!(diskRadius==0.0)){
 			//double rad = randGen.nextGaussian()*diskRadius/2;
-			double rad = Math.sqrt(randGen.nextDouble()*diskRadius*diskRadius);
+			double radDist = Math.sqrt(randGen.nextDouble()*diskRadius*diskRadius);
+			radDist *= Math.sqrt(radDist/diskRadius);
 			double theta=randGen.nextDouble()*Math.PI*2;
 			
-			double xOffset=rad*Math.cos(theta);
-			double yOffset=rad*Math.sin(theta);
+			double xOffset=radDist*Math.cos(theta);
+			double yOffset=radDist*Math.sin(theta);
 			xPosition+=xOffset;
 			yPosition+=yOffset;
 			distToCenter=Math.sqrt((xPosition-diskCenterX)*(xPosition-diskCenterX)+(yPosition-diskCenterY)*(yPosition-diskCenterY));
 			double spin=Math.sqrt((constantGravity*baryMass)/distToCenter)*spinFactor;
 			xVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
 			yVelocity=vel+((Math.random()*2.0-1.0)*varyVel);
-			
+			double rad;
 			if (Math.random()<spinRatio){
-				rad = randGen.nextGaussian()-randSpin;
+				rad = (randGen.nextGaussian()-randSpin)*Math.sqrt(radDist/diskRadius);
 			}else{
-				rad = randGen.nextGaussian()+randSpin;	
+				rad = (randGen.nextGaussian()+randSpin)*Math.sqrt(radDist/diskRadius);	
 			}
 			theta=Math.atan2(yPosition,xPosition) + 0.5*Math.PI;
 			xVelocity=+rad*Math.cos(theta);

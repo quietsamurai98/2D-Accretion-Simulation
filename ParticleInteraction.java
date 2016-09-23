@@ -73,14 +73,6 @@ public class ParticleInteraction {
 		randomSpin              = kb.nextDouble();
 		System.out.print("Spin ratio (0 = all clockwise, 1 = all anti-clockwise)     = ");
 		spinRatio			    = kb.nextDouble();
-//		System.out.print("Is there a central particle? (default = false)             = ");
-//		centralParticle         = kb.nextBoolean();
-//		if (centralParticle){
-//			System.out.print("Mass of the central particle (default = 100)                   = ");
-//			centralParticleMass     = kb.nextDouble(); 
-//		}
-//		System.out.print("Collision Distance Factor (default = 1.0)                  = ");
-//		collisionDistanceFactor = kb.nextDouble();
 		
 		particleNum             = particleCount;
     } 
@@ -101,12 +93,7 @@ public class ParticleInteraction {
 			elapsedTime=System.nanoTime()-startTime;
 			saveText();
 	        printTime();
-			try{
-	        	dataBW.flush();
-	        }
-	        catch (IOException e){
-	        	e.printStackTrace();
-	        }
+			
 		}
     }
 
@@ -153,7 +140,7 @@ public class ParticleInteraction {
 				"constantGravity         = "+ constantGravity + "\r\n" +
 				"variationVel            = "+ variationVel + "\r\n" +
 				"initialSpinFactor       = "+ initialSpinFactor + "\r\n" +
-				"randomSpin	             = "+ randomSpin + "\r\n" +
+				"randomSpin              = "+ randomSpin + "\r\n" +
 				"spinRatio               = "+ spinRatio + "\r\n"
 //				"centralParticleMass     = "+ centralParticleMass + "\r\n" +
 //				"centralParticle         = "+ Boolean.toString(centralParticle) + "\r\n" +
@@ -217,9 +204,15 @@ public class ParticleInteraction {
         
         try{
         	for(int i=0;i<particleCount;i++){
-        		dataBW.write(particleArray[i] + " ");
+        		if (boolArray[i]){
+        			dataBW.write(particleArray[i] + " ");
+        		} else {
+        			dataBW.write("SKIP ");
+        		}
+        		
         	}
     		dataBW.write("\n");
+    		dataBW.flush();
     	}
     	catch (IOException e){
     		e.printStackTrace();
@@ -229,7 +222,7 @@ public class ParticleInteraction {
     	if (oldParticleNum!=particleNum){
     		System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained... ");
     		System.out.println("     "+particleNum+" particles total");
-    		System.out.println("     "+planets+" planets");//, of which "+escaping+" are escaping");
+    		System.out.println("     "+planets + " planets");//, of which "+escaping+" are escaping");
     	}
     }
     private void calculateGrav(){

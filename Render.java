@@ -81,19 +81,29 @@ public class Render {
 			colors[i] = new Color((int)(Math.random()*256),(int)(Math.random()*256),(int)(Math.random()*256),128);
 		}
 		x[0]=0;
-		int frameCount = frameStart;
+		int frameCount = 0;
+		for (int i=1; i<frameStart; i++){
+			input.readLine();
+			frameCount++;
+		}
 		while((dataString = input.readLine()) != null){
-    		startTime=System.nanoTime();
-	    	picCount++;
-	    	readTextFile(dataString);
-	    	focus();
-	    	drawParticles();
-	    	if (trailLength!=0)
-	    		drawTrails();
-	    	saveImage();
-	    	elapsedTime=System.nanoTime()-startTime;
-	    	System.out.println("Image "+picCount+" (Frame " + frameCount + ") saved (took " + String.format("%014d", elapsedTime) + " nanoseconds)");
-	    	frameCount+=frameSkip;
+				frameCount++;
+	    		startTime=System.nanoTime();
+		    	picCount++;
+		    	readTextFile(dataString);
+		    	focus();
+		    	drawParticles();
+		    	if (trailLength!=0){
+		    		fadeTrails();
+		    		drawTrails();
+		    	}
+		    	saveImage();
+		    	elapsedTime=System.nanoTime()-startTime;
+		    	System.out.println("Image "+picCount+" (Frame " + frameCount + ") saved (took " + String.format("%014d", elapsedTime) + " nanoseconds)");
+				for (int i=1; i<frameSkip; i++){
+					input.readLine();
+					frameCount++;
+				}
     	}
     	if (dataString == null){
     		System.out.println("Reached a null");
@@ -121,12 +131,21 @@ public class Render {
 //    	}
         Scanner inputScanner = new Scanner(dataString);
         int j = 0;
-        while(inputScanner.hasNextDouble()){
+        String temp = "";
+        while(inputScanner.hasNext()){
+        	temp = inputScanner.next();
         	xOld[j]=x[j];
         	yOld[j]=y[j];
-	        x[j]=inputScanner.nextDouble();
-	        y[j]=inputScanner.nextDouble();
-	        m[j]=inputScanner.nextDouble();
+        	if (temp.equals("SKIP")){
+        		x[j]=10001;
+	        	y[j]=10001;
+	        	m[j]=0;
+        	} else {
+        		x[j]=Double.parseDouble(temp);
+	        	y[j]=inputScanner.nextDouble();
+	        	m[j]=inputScanner.nextDouble();
+        	}
+	        
 	        j++;
         }
         if (picCount==1){
@@ -181,7 +200,7 @@ public class Render {
 			}
 		}
 	}
-	private void drawTrails(){
+	private void fadeTrails(){
 		if (picCount%trailLength==0){
 			int testCol = 0;
 			for(int i = 0; i<imageSizeX; i++){
@@ -198,15 +217,20 @@ public class Render {
 				}
 			}
 		}
-			
+	}
+	private void drawTrails(){
 		for(int i = 0; i<length; i++){
-			if (x[i]<10000 && m[i]>minMass){
-				trailGraphics.setColor(colors[i]);
-				trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
-				trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2)+1,(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2)+1,(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
-				trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2)-1,(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)-1));
-				trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2)-1,(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2)-1,(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
-				trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2)+1,(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)+1));
+			if (x[i]<10000){
+				if (m[i]>(minMass)){
+					trailGraphics.setColor(colors[i]);
+					trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
+					if (m[i]>(2*minMass)){
+						trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2)+1,(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2)+1,(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
+						trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2)-1,(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)-1));
+						trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2)-1,(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2)-1,(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
+						trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2)+1,(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)+1));
+					}
+				}
 			}
 		}
 	}
@@ -217,7 +241,7 @@ public class Render {
 		outputGraphics.drawImage(particleImage, 0, 0, null);
 		File f = null;
 		try{
-            f = new File(directoryImageString+String.format("%010d", picCount)+".png");
+            f = new File(directoryImageString+String.format("%010d", picCount)+".PNG");
             ImageIO.write(outputImage, "PNG", f);
         }
         catch(Exception e){
