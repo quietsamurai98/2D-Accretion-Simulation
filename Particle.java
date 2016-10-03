@@ -62,6 +62,9 @@ public class Particle {
 			}else{
 				rad = (randGen.nextGaussian()+randSpin)*Math.sqrt(radDist/diskRadius);
 			}
+			if (randSpin==0.0){
+				rad = 0;
+			}
 			theta=Math.atan2(yPosition,xPosition) + 0.5*Math.PI;
 			xVelocity=+rad*Math.cos(theta);
 			yVelocity=+rad*Math.sin(theta);
