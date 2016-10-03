@@ -81,7 +81,7 @@ public class ParticleInteraction {
 	    				//synchronized (GT1){
 	    					while (true){
 	    						if(GT1){
-				    				for (int i = (particleCount/4)*3; i < particleCount; i++){
+				    				for (int i = 0; i < (particleCount/4); i++){
 				    					if (boolArray[i]){
 											double iX = particleArray[i].getXPosition();
 											double iY = particleArray[i].getYPosition();
@@ -113,7 +113,7 @@ public class ParticleInteraction {
 	    				//synchronized (GT2){
 	    					while (true){
 	    						if(GT2){
-				    				for (int i = (particleCount/4)*3; i < particleCount; i++){
+				    				for (int i = (particleCount/4); i < (particleCount/4)*2; i++){
 				    					if (boolArray[i]){
 											double iX = particleArray[i].getXPosition();
 											double iY = particleArray[i].getYPosition();
@@ -145,7 +145,7 @@ public class ParticleInteraction {
 	    				//synchronized (GT3){
 	    					while (true){
 	    						if(GT3){
-				    				for (int i = (particleCount/4)*3; i < particleCount; i++){
+				    				for (int i = (particleCount/4)*2; i < (particleCount/4)*3; i++){
 				    					if (boolArray[i]){
 											double iX = particleArray[i].getXPosition();
 											double iY = particleArray[i].getYPosition();
