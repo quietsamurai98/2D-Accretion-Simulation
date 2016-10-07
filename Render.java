@@ -49,6 +49,8 @@ public class Render {
 	long startTime, elapsedTime;
 	File inputFile;
 	FileReader inputFW;
+	int frameCount;
+	int saveOn=2;
 	
 	
     public Render(String name, int particles, int lengthMultiplier, double min, int frameStartConstruct, int frameSkipConstruct, int resolutionX, int resolutionY, double zoomFactor) {
@@ -81,7 +83,7 @@ public class Render {
 			colors[i] = new Color((int)(Math.random()*256),(int)(Math.random()*256),(int)(Math.random()*256),128);
 		}
 		x[0]=0;
-		int frameCount = 0;
+		frameCount = 0;
 		for (int i=1; i<frameStart; i++){
 			input.readLine();
 			frameCount++;
@@ -89,7 +91,6 @@ public class Render {
 		while((dataString = input.readLine()) != null){
 				frameCount++;
 	    		startTime=System.nanoTime();
-		    	picCount++;
 		    	readTextFile(dataString);
 		    	focus();
 		    	drawParticles();
@@ -99,8 +100,7 @@ public class Render {
 		    	}
 		    	saveImage();
 		    	elapsedTime=System.nanoTime()-startTime;
-		    	System.out.println("Image "+picCount+" (Frame " + frameCount + ") saved (took " + String.format("%014d", elapsedTime) + " nanoseconds)");
-				for (int i=1; i<frameSkip; i++){
+		    	for (int i=1; i<frameSkip; i++){
 					input.readLine();
 					frameCount++;
 				}
@@ -201,7 +201,7 @@ public class Render {
 		}
 	}
 	private void fadeTrails(){
-		if (picCount%trailLength==0){
+		if (true || picCount%trailLength==0){
 			int testCol = 0;
 			for(int i = 0; i<imageSizeX; i++){
 				for(int j = 0; j<imageSizeY; j++){
@@ -235,19 +235,25 @@ public class Render {
 		}
 	}
 	private void saveImage(){
-		BufferedImage outputImage = new BufferedImage(imageSizeX, imageSizeY, BufferedImage.TYPE_INT_ARGB );
-		Graphics2D outputGraphics = outputImage.createGraphics();
-		outputGraphics.drawImage(trailImage, 0, 0, null);
-		outputGraphics.drawImage(particleImage, 0, 0, null);
-		File f = null;
-		try{
-            f = new File(directoryImageString+String.format("%010d", picCount)+".PNG");
-            ImageIO.write(outputImage, "PNG", f);
-        }
-        catch(Exception e){
-        	System.out.println(f.getAbsolutePath() + "\nFAILURE TO SAVE IMAGE");
-            e.printStackTrace();
-        }
+		if(saveOn==frameCount){
+			picCount++;
+			BufferedImage outputImage = new BufferedImage(imageSizeX, imageSizeY, BufferedImage.TYPE_INT_ARGB );
+			Graphics2D outputGraphics = outputImage.createGraphics();
+			outputGraphics.drawImage(trailImage, 0, 0, null);
+			outputGraphics.drawImage(particleImage, 0, 0, null);
+			File f = null;
+			try{
+	            f = new File(directoryImageString+String.format("%010d", picCount)+".PNG");
+	            ImageIO.write(outputImage, "PNG", f);
+	        }
+	        catch(Exception e){
+	        	System.out.println(f.getAbsolutePath() + "\nFAILURE TO SAVE IMAGE");
+	            e.printStackTrace();
+	        }
+	        System.out.println("Image "+picCount+" (Frame " + frameCount + ") saved (took " + String.format("%014d", elapsedTime) + " nanoseconds)");
+			saveOn+=(int)Math.pow(10.0,((picCount-1)/60.0))+1;
+			
+		}
     }
     private void createDirectory(String name){
     	File directory = new File(directoryImageNameString);
