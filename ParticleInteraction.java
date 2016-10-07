@@ -90,6 +90,11 @@ public class ParticleInteraction {
 	        printTime();
 
 		}
+		System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained... ");
+    	System.out.println("     "+particleNum+" particles total");
+    	System.out.println("     "+planets + " planets");//, of which "+escaping+" are escaping");
+    	System.out.println(frameCap+" Frames have passed without a collision. Ending the simulation.");
+		
     }
 
     private void createDirectory(){
@@ -360,8 +365,8 @@ public class ParticleInteraction {
 			}
 			if (particleArray[i].getMass()>(initialMass)*2){
 				planets++; //Bodies consisting of 2+ particles
-				if (particleArray[i].getXVelocity()*particleArray[i].getXVelocity()+particleArray[i].getYVelocity()*particleArray[i].getYVelocity() > initialMass*particleCount*constantGravity*2/Math.sqrt(particleArray[i].getXPosition()*particleArray[i].getXPosition()+particleArray[i].getYPosition()*particleArray[i].getYPosition()))
-					escaping++;
+//				if (particleArray[i].getXVelocity()*particleArray[i].getXVelocity()+particleArray[i].getYVelocity()*particleArray[i].getYVelocity() > (initialMass*particleCount-particleArray[i].getMass())*constantGravity*2/Math.sqrt(particleArray[i].getXPosition()*particleArray[i].getXPosition()+particleArray[i].getYPosition()*particleArray[i].getYPosition()))
+//					escaping++;
 			}
 		}
     }

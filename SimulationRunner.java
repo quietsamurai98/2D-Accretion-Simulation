@@ -132,7 +132,7 @@ public class SimulationRunner {
 		    	constantGravity = 0.001;
 		  	}
 			System.out.print("Stop simulation after ___ frames have passed without a\n"+
-							 " collision (default = 50000)                              = ");
+							 " collision (default = 500000)                              = ");
 			try
 		  	{
 		    	frameCap        = Integer.parseInt(kb.next());
