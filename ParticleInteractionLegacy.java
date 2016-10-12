@@ -9,7 +9,7 @@ import java.lang.*;
 import java.util.*;
 import java.util.Scanner;
 import java.io.*;
-public class ParticleInteraction {
+public class ParticleInteractionLegacy {
 
     /**
      * Creates a new instance of <code>ParticleInteraction</code>.
@@ -57,7 +57,7 @@ public class ParticleInteraction {
 	boolean GT3;
 	boolean GT4;
 	
-    public ParticleInteraction(String nameConstructor, int particleCountConstructor, int frameCapConstructor, double initialMassConstructor, double variationMassConstructor, double diskRadiusConstructor, double randomSpinConstructor, double spinRatioConstructor, double variationVelConstructor, double deltaTimeConstructor, double constantGravityConstructor) {
+    public ParticleInteractionLegacy(String nameConstructor, int particleCountConstructor, int frameCapConstructor, double initialMassConstructor, double variationMassConstructor, double diskRadiusConstructor, double randomSpinConstructor, double spinRatioConstructor, double variationVelConstructor, double deltaTimeConstructor, double constantGravityConstructor) {
 		simulate(nameConstructor, particleCountConstructor, frameCapConstructor, initialMassConstructor, variationMassConstructor, diskRadiusConstructor, randomSpinConstructor, spinRatioConstructor, variationVelConstructor, deltaTimeConstructor, constantGravityConstructor);
     }
 
@@ -85,10 +85,10 @@ public class ParticleInteraction {
 			calculateGrav();
 	        frameCount++;
 			stepTime();
-			saveText();
 			elapsedTime=System.nanoTime()-startTime;
-	        printTime();
-	        //calculateEnergy();
+			saveText();
+	        //printTime();
+	        calculateEnergy();
 
 		}
 		System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained... ");
@@ -324,11 +324,11 @@ public class ParticleInteraction {
     		GravThreadFour.join();
     	}
     	catch (InterruptedException e){
-    		e.printStackTrace();
+    		
     	}
     	
     }
-        private void collideParticles(){
+    private void collideParticles(){
     	escaping=0;
     	planets=0;
     	for(int i=0; i<particleCount; i++){
@@ -404,66 +404,5 @@ public class ParticleInteraction {
 			energy += 0.5*particleArray[0].getMass()*((particleArray[0].getXVelocity()*particleArray[0].getXVelocity())+(particleArray[0].getYVelocity()*particleArray[0].getYVelocity()));
 		}
 		System.out.println(energy);
-	}
-	
-	
-	private void RecursiveCollideParticles(){ //Doesn't seem to work. Not sure why.
-    	boolean recur = false;
-    	for (int i=0; i<particleCount; i++){
-    		if (boolArray[i]){
-    			double iX = (particleArray[i].getXPosition()*200)+400;
-				double iY = (particleArray[i].getYPosition()*200)+400;
-				double iR = particleArray[i].getRadius();
-				for (int j = 0; j < i; j++){
-					if (boolArray[j]){
-						double jX = (particleArray[j].getXPosition()*200)+400;
-						double jY = (particleArray[j].getYPosition()*200)+400;
-						double jR = particleArray[j].getRadius();
-						double R = iR+jR;
-						if (iX+R>jX && jX+R>iX && iY+R>jY && jY+R>iY){
-							double dist = Math.sqrt((iX-jX)*(iX-jX)+(iY-jY)*(iY-jY));
-							if (dist<R){
-								//collision
-								double iM = particleArray[i].getMass();
-								double jM = particleArray[j].getMass();
-								int p=i;
-								int c=j;
-								if (iM<jM){
-									p=j;
-									c=i;
-								}
-								double pPX = particleArray[p].getXPosition();
-								double pPY = particleArray[p].getYPosition();
-								double pVX = particleArray[p].getXVelocity();
-								double pVY = particleArray[p].getYVelocity();
-								double pM = particleArray[p].getMass();
-								
-								double cPX = particleArray[c].getXPosition();
-								double cPY = particleArray[c].getYPosition();
-								double cVX = particleArray[c].getXVelocity();
-								double cVY = particleArray[c].getYVelocity();
-								double cM = particleArray[c].getMass();
-								
-								double nM = pM+cM;
-								double nVX = (pM*pVX+cM*cVX)/nM;
-								double nVY = (pM*pVY+cM*cVY)/nM;
-								double nPX = (pM*pPX+cM*cPX)/nM;
-								double nPY = (pM*pPY+cM*cPY)/nM;
-								
-								particleArray[p].setMVP(nM,nVX,nVY,nPX,nPY);
-								boolArray[c] = false;
-								System.out.print("Recursive call ");
-								recur = true;
-								i=2*particleCount;
-								j=3*particleCount;
-							}
-						}
-					}
-				}
-    		}
-    	}
-    	if (recur){
-    		collideParticles();
-    	}
 	}
 }
