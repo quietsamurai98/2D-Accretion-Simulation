@@ -21,7 +21,7 @@ public class RenderRunner {
     public static void main(String[] args) throws IOException {
     	Scanner kb = new Scanner(System.in);
     	System.out.print("Simulation name: ");
-    	String name = kb.next();
+    	String name = kb.nextLine();
     	System.out.print("Number of particles in the simulation: ");
     	int particles           = kb.nextInt();
     	System.out.print("First simulation frame to render (1 to start from beginning) : ");
@@ -38,7 +38,7 @@ public class RenderRunner {
     	int lengthMultiplier = Math.max((int)kb.nextDouble(),0);
     	System.out.print("Minimum mass to draw trails (0 to show all trails) : ");
     	double minMass             = kb.nextDouble();
-        Render render = new Render(name, particles, lengthMultiplier, minMass, frameStart, frameSkip, resolutionX, resolutionY, zoom);
+        RenderEnergy render = new RenderEnergy(name, particles, lengthMultiplier, minMass, frameStart, frameSkip, resolutionX, resolutionY, zoom);
         render.methodRunner();
         System.out.println("Rendering completed!");
     }

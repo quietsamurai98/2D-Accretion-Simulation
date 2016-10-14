@@ -62,6 +62,9 @@ public class Particle {
 			}else{
 				rad = (randGen.nextGaussian()+randSpin)*Math.sqrt(radDist/diskRadius);
 			}
+			if (randSpin==0.0){
+				rad = 0;
+			}
 			theta=Math.atan2(yPosition,xPosition) + 0.5*Math.PI;
 			xVelocity=+rad*Math.cos(theta);
 			yVelocity=+rad*Math.sin(theta);
@@ -144,5 +147,12 @@ public class Particle {
     public String toString(){
     	String out = (int)((xPosition+0.0005)*1000)/1000.0 + " " + (int)((yPosition+0.0005)*1000)/1000.0 + " " + (int)((mass+0.0005)*1000)/1000.0;
     	return out;
+    }
+    public void setMVP(double M,double VX,double VY,double PX,double PY){
+    	setMass(M);
+    	setXVelocity(VX);
+    	setYVelocity(VY);
+    	setXPosition(PX);
+    	setYPosition(PY);
     }
 }
