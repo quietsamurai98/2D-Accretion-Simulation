@@ -46,7 +46,17 @@ public class ParticleInteraction {
 	String name;
 	BufferedWriter dataBW;
 	int lastCollisionFrame;
-
+	
+	int maxThreadCount =  Runtime.getRuntime().availableProcessors();
+	Thread GravThreadOne;
+	Thread GravThreadTwo;
+	Thread GravThreadThree;
+	Thread GravThreadFour;
+	boolean GT1;
+	boolean GT2;
+	boolean GT3;
+	boolean GT4;
+	
     public ParticleInteraction(String nameConstructor, int particleCountConstructor, int frameCapConstructor, double initialMassConstructor, double variationMassConstructor, double diskRadiusConstructor, double randomSpinConstructor, double spinRatioConstructor, double variationVelConstructor, double deltaTimeConstructor, double constantGravityConstructor) {
 		simulate(nameConstructor, particleCountConstructor, frameCapConstructor, initialMassConstructor, variationMassConstructor, diskRadiusConstructor, randomSpinConstructor, spinRatioConstructor, variationVelConstructor, deltaTimeConstructor, constantGravityConstructor);
     }
@@ -63,17 +73,29 @@ public class ParticleInteraction {
 		spawnParticles();
 		frameCount=0;
 		lastCollisionFrame=0;
+		GT1=false;
+		GT2=false;
+		GT3=false;
+		GT4=false;
+		
+		
 		while(frameCount-lastCollisionFrame<frameCap){
 			startTime = System.nanoTime();
 			collideParticles();
 			calculateGrav();
 	        frameCount++;
 			stepTime();
-			elapsedTime=System.nanoTime()-startTime;
 			saveText();
+			elapsedTime=System.nanoTime()-startTime;
 	        printTime();
+	        //calculateEnergy();
 
 		}
+		System.out.println("Frame "+String.format("%010d", frameCount)+" took " + String.format("%014d", elapsedTime) + " nanoseconds, and contained... ");
+    	System.out.println("     "+particleNum+" particles total");
+    	System.out.println("     "+planets + " planets");//, of which "+escaping+" are escaping");
+    	System.out.println(frameCap+" Frames have passed without a collision. Ending the simulation.");
+		
     }
 
     private void createDirectory(){
@@ -206,25 +228,107 @@ public class ParticleInteraction {
     	}
     }
     private void calculateGrav(){
-    	for(int i=0; i<particleCount; i++){
-			if (boolArray[i]){
-				double iX = particleArray[i].getXPosition();
-				double iY = particleArray[i].getYPosition();
-				double iM = particleArray[i].getMass();
-				for(int j=0; j<particleCount; j++){
-					if(i!=j&&boolArray[j]){
-						double rX = iX-particleArray[j].getXPosition();
-						double rY = iY-particleArray[j].getYPosition();
-						double rT = Math.sqrt(rX*rX+rY*rY);
-						double rF = rT*rT*rT;
-						double fT = -constantGravity*iM*particleArray[j].getMass()/rF;
-						particleArray[i].updateForce(rX*fT, rY*fT);
+    	
+    	Thread GravThreadOne = new Thread(){
+    		public void run(){
+				for (int i = 0; i < (particleCount/4); i++){
+					if (boolArray[i]){
+						double iX = particleArray[i].getXPosition();
+						double iY = particleArray[i].getYPosition();
+						double iM = particleArray[i].getMass();
+						for(int j=0; j<particleCount; j++){
+							if(i!=j&&boolArray[j]){
+								double rX = iX-particleArray[j].getXPosition();
+								double rY = iY-particleArray[j].getYPosition();
+								double rT = Math.sqrt(rX*rX+rY*rY);
+								double rF = rT*rT*rT;
+								double fT = -constantGravity*iM*particleArray[j].getMass()/rF;
+								particleArray[i].updateForce(rX*fT, rY*fT);
+							}
+						}
 					}
 				}
 			}
-		}
+    	};
+    	Thread GravThreadTwo = new Thread(){
+    		public void run(){
+				for (int i = (particleCount/4); i < (particleCount/4)*2; i++){
+					if (boolArray[i]){
+						double iX = particleArray[i].getXPosition();
+						double iY = particleArray[i].getYPosition();
+						double iM = particleArray[i].getMass();
+						for(int j=0; j<particleCount; j++){
+							if(i!=j&&boolArray[j]){
+								double rX = iX-particleArray[j].getXPosition();
+								double rY = iY-particleArray[j].getYPosition();
+								double rT = Math.sqrt(rX*rX+rY*rY);
+								double rF = rT*rT*rT;
+								double fT = -constantGravity*iM*particleArray[j].getMass()/rF;
+								particleArray[i].updateForce(rX*fT, rY*fT);
+							}
+						}
+					}
+				}
+    		}
+    	};
+    	Thread GravThreadThree = new Thread(){
+    		public void run(){
+				for (int i = (particleCount/4)*2; i < (particleCount/4)*3; i++){
+					if (boolArray[i]){
+						double iX = particleArray[i].getXPosition();
+						double iY = particleArray[i].getYPosition();
+						double iM = particleArray[i].getMass();
+						for(int j=0; j<particleCount; j++){
+							if(i!=j&&boolArray[j]){
+								double rX = iX-particleArray[j].getXPosition();
+								double rY = iY-particleArray[j].getYPosition();
+								double rT = Math.sqrt(rX*rX+rY*rY);
+								double rF = rT*rT*rT;
+								double fT = -constantGravity*iM*particleArray[j].getMass()/rF;
+								particleArray[i].updateForce(rX*fT, rY*fT);
+							}
+						}
+					}
+				}
+    		}
+    	};
+    	Thread GravThreadFour = new Thread(){
+    		public void run(){
+				for (int i = (particleCount/4)*3; i < particleCount; i++){
+					if (boolArray[i]){
+						double iX = particleArray[i].getXPosition();
+						double iY = particleArray[i].getYPosition();
+						double iM = particleArray[i].getMass();
+						for(int j=0; j<particleCount; j++){
+							if(i!=j&&boolArray[j]){
+								double rX = iX-particleArray[j].getXPosition();
+								double rY = iY-particleArray[j].getYPosition();
+								double rT = Math.sqrt(rX*rX+rY*rY);
+								double rF = rT*rT*rT;
+								double fT = -constantGravity*iM*particleArray[j].getMass()/rF;
+								particleArray[i].updateForce(rX*fT, rY*fT);
+							}
+						}
+					}
+    			}
+    		}
+    	};
+		GravThreadOne.start();
+    	GravThreadTwo.start();
+    	GravThreadThree.start();
+    	GravThreadFour.start();
+    	try{
+    		GravThreadOne.join();
+    		GravThreadTwo.join();
+    		GravThreadThree.join();
+    		GravThreadFour.join();
+    	}
+    	catch (InterruptedException e){
+    		e.printStackTrace();
+    	}
+    	
     }
-    private void collideParticles(){
+        private void collideParticles(){
     	escaping=0;
     	planets=0;
     	for(int i=0; i<particleCount; i++){
@@ -262,8 +366,8 @@ public class ParticleInteraction {
 			}
 			if (particleArray[i].getMass()>(initialMass)*2){
 				planets++; //Bodies consisting of 2+ particles
-				if (particleArray[i].getXVelocity()*particleArray[i].getXVelocity()+particleArray[i].getYVelocity()*particleArray[i].getYVelocity() > initialMass*particleCount*constantGravity*2/Math.sqrt(particleArray[i].getXPosition()*particleArray[i].getXPosition()+particleArray[i].getYPosition()*particleArray[i].getYPosition()))
-					escaping++;
+//				if (particleArray[i].getXVelocity()*particleArray[i].getXVelocity()+particleArray[i].getYVelocity()*particleArray[i].getYVelocity() > (initialMass*particleCount-particleArray[i].getMass())*constantGravity*2/Math.sqrt(particleArray[i].getXPosition()*particleArray[i].getXPosition()+particleArray[i].getYPosition()*particleArray[i].getYPosition()))
+//					escaping++;
 			}
 		}
     }
@@ -281,5 +385,85 @@ public class ParticleInteraction {
     	constantGravity = constantGravityConstructor;
 		particleNum = particleCount;
     }
-
+	private void calculateEnergy(){
+		double energy = 0.0;
+		for (int i = 1; i < particleCount; i++){
+			if (boolArray[i]){
+				double iX = particleArray[i].getXPosition();
+				double iY = particleArray[i].getYPosition();
+				double iM = particleArray[i].getMass();
+				for (int j = 0; j < i; j++){
+					if (boolArray[j]){
+						energy -= constantGravity*iM*particleArray[j].getMass()/Math.sqrt( ((iX-particleArray[j].getXPosition())*(iX-particleArray[j].getXPosition())) + ((iY-particleArray[j].getYPosition())*(iY-particleArray[j].getYPosition())) );
+					}
+				}
+				energy += 0.5*iM*((particleArray[i].getXVelocity()*particleArray[i].getXVelocity())+(particleArray[i].getYVelocity()*particleArray[i].getYVelocity()));
+			}
+		}
+		if (boolArray[0]){
+			energy += 0.5*particleArray[0].getMass()*((particleArray[0].getXVelocity()*particleArray[0].getXVelocity())+(particleArray[0].getYVelocity()*particleArray[0].getYVelocity()));
+		}
+		System.out.println(energy);
+	}
+	
+	
+	private void RecursiveCollideParticles(){ //Doesn't seem to work. Not sure why.
+    	boolean recur = false;
+    	for (int i=0; i<particleCount; i++){
+    		if (boolArray[i]){
+    			double iX = (particleArray[i].getXPosition()*200)+400;
+				double iY = (particleArray[i].getYPosition()*200)+400;
+				double iR = particleArray[i].getRadius();
+				for (int j = 0; j < i; j++){
+					if (boolArray[j]){
+						double jX = (particleArray[j].getXPosition()*200)+400;
+						double jY = (particleArray[j].getYPosition()*200)+400;
+						double jR = particleArray[j].getRadius();
+						double R = iR+jR;
+						if (iX+R>jX && jX+R>iX && iY+R>jY && jY+R>iY){
+							double dist = Math.sqrt((iX-jX)*(iX-jX)+(iY-jY)*(iY-jY));
+							if (dist<R){
+								//collision
+								double iM = particleArray[i].getMass();
+								double jM = particleArray[j].getMass();
+								int p=i;
+								int c=j;
+								if (iM<jM){
+									p=j;
+									c=i;
+								}
+								double pPX = particleArray[p].getXPosition();
+								double pPY = particleArray[p].getYPosition();
+								double pVX = particleArray[p].getXVelocity();
+								double pVY = particleArray[p].getYVelocity();
+								double pM = particleArray[p].getMass();
+								
+								double cPX = particleArray[c].getXPosition();
+								double cPY = particleArray[c].getYPosition();
+								double cVX = particleArray[c].getXVelocity();
+								double cVY = particleArray[c].getYVelocity();
+								double cM = particleArray[c].getMass();
+								
+								double nM = pM+cM;
+								double nVX = (pM*pVX+cM*cVX)/nM;
+								double nVY = (pM*pVY+cM*cVY)/nM;
+								double nPX = (pM*pPX+cM*cPX)/nM;
+								double nPY = (pM*pPY+cM*cPY)/nM;
+								
+								particleArray[p].setMVP(nM,nVX,nVY,nPX,nPY);
+								boolArray[c] = false;
+								System.out.print("Recursive call ");
+								recur = true;
+								i=2*particleCount;
+								j=3*particleCount;
+							}
+						}
+					}
+				}
+    		}
+    	}
+    	if (recur){
+    		collideParticles();
+    	}
+	}
 }
