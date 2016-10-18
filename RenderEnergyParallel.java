@@ -7,6 +7,7 @@
  */
 
 import java.util.Scanner;
+import java.util.*;
 import java.io.*;
 import java.awt.geom.*;
 import java.awt.Graphics;
@@ -15,7 +16,13 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import javax.imageio.*;
-public class Render {
+public class RenderEnergyParallel{
+	
+	
+	
+	//int plotRes = 1;
+	int threadRes = 120;
+	
 	int imageSizeX;
 	int imageSizeY;
 	int length;
@@ -27,12 +34,10 @@ public class Render {
 	int focusOn = 1;
 	double centerX;
 	double centerY;
-	BufferedImage particleImage;
-	BufferedImage trailImage;
+	BufferedImage energyImage;
 	int blackInt = new Color(0,0,0).getRGB();
 	int whiteInt = new Color(255,255,255).getRGB();
-	Graphics2D trailGraphics;
-	Graphics2D particleGraphics;
+	Graphics2D energyGraphics;
 	String directoryTextString;
 	String directoryImageString;
 	String directoryImageNameString;
@@ -44,20 +49,26 @@ public class Render {
 	int frameCount;
 	int picCount;
 	double saveOn;
-	Color[] colors;
+	ArrayList<Integer> colorMap;
 	double zoom;
 	BufferedReader input;
 	String dataString;
 	long startTime, elapsedTime;
 	File inputFile;
 	FileReader inputFW;
+	
 	Thread ImageSaver;
 	double incrementer;
 	
+	static final double base = 1.1; //Log base for contour color
+	static final double baseLog = 1.0/Math.log(base); // used for contour color
 	
-    public Render(String name, int particles, int lengthMultiplier, double min, int frameStartConstruct, int frameSkipConstruct, int resolutionX, int resolutionY, double zoomFactor) {
-    	directoryImageString = ".\\"+name+"\\image frames\\";
-    	directoryImageNameString = name+"\\image frames";
+	double[][] PotentialEnergyArray;
+	Thread[][] CalculationThreads;
+	
+    public RenderEnergyParallel(String name, int particles, int lengthMultiplier, double min, int frameStartConstruct, int frameSkipConstruct, int resolutionX, int resolutionY, double zoomFactor) {
+    	directoryImageString = ".\\"+name+"\\energy image frames\\";
+    	directoryImageNameString = name+"\\energy image frames";
     	particleCount = particles;
     	trailLength   = lengthMultiplier;
     	minMass		  = min;
@@ -70,20 +81,13 @@ public class Render {
     	createDirectory(name);	
     }
     public void methodRunner() throws IOException{
+    	generateColorMap();
     	length=particleCount;
-    	trailImage = new BufferedImage(imageSizeX, imageSizeY, BufferedImage.TYPE_INT_ARGB );
-    	trailGraphics = trailImage.createGraphics();
-    	trailGraphics.setColor(Color.black);
-    	trailGraphics.fillRect(0,0,imageSizeX,imageSizeY);
     	x = new double[particleCount];
 		xOld = new double[particleCount];
 		y = new double[particleCount];
 		yOld = new double[particleCount];
 		m = new double[particleCount];
-		colors = new Color[particleCount];
-		for(int i = 0;i<particleCount;i++){
-			colors[i] = new Color((int)(Math.random()*256),(int)(Math.random()*256),(int)(Math.random()*256),128);
-		}
 		x[0]=0;
 		frameCount = 0;
 		picCount = 0;
@@ -96,13 +100,11 @@ public class Render {
 				frameCount++;
 	    		startTime=System.nanoTime();
 		    	readTextFile(dataString);
-		    	focus();
-		    	drawParticles();
-		    	if (trailLength!=0){
-		    		fadeTrails();
-		    		drawTrails();
+		    	if ((int)saveOn==frameCount){
+		    		focus();
+		    		drawEnergy();
+		    		saveImage();
 		    	}
-		    	saveImage();
     	}
     	if (dataString == null){
     		System.out.println("Reached a null");
@@ -167,58 +169,46 @@ public class Render {
         }
     }
     
-    private void drawParticles(){
-    	particleImage = new BufferedImage(imageSizeX, imageSizeY, BufferedImage.TYPE_INT_ARGB );
-    	particleGraphics = particleImage.createGraphics();
-    	particleGraphics.setColor(new Color(0, true));
-    	particleGraphics.fillRect(0,0,imageSizeX,imageSizeY);
-    	for(int i=0; i<length; i++){
-			int dispX = (int)(((x[i]-centerX)*200*zoom)+imageSizeX/2);
-			int dispY = (int)(((y[i]-centerY)*200*zoom)+imageSizeY/2);
-			int radius = (int)((Math.sqrt(m[i]))/2*zoom);
-			for (int j = dispX-radius; j <= dispX+radius;j++){
-				for (int k = dispY-radius; k <= dispY+radius;k++){
-					if((j<imageSizeX)&&(k<imageSizeY)&&(j>0)&&(k>0)){
-						if (((dispX-j)*(dispX-j)+(dispY-k)*(dispY-k))<=(radius*radius)){
-							particleImage.setRGB(j,k, whiteInt);
+	private void drawEnergy(){
+		energyImage = new BufferedImage(imageSizeX, imageSizeY, BufferedImage.TYPE_INT_RGB );
+		energyGraphics = energyImage.createGraphics();
+		CalculationThreads = new Thread[imageSizeX/threadRes][imageSizeY/threadRes];
+		for(int pxlX=0; pxlX<CalculationThreads.length; pxlX+=1){
+    		for(int pxlY=0; pxlY<CalculationThreads[pxlX].length; pxlY+=1){
+    			CalculationThreads[pxlX][pxlY] = new Thread(){
+					public void run(){
+						int nameX = Integer.parseInt(getName().substring(0,4));
+						int nameY = Integer.parseInt(getName().substring(4,8));
+						for(int offsetX=0; offsetX<threadRes; offsetX++){
+							for(int offsetY=0; offsetY<threadRes; offsetY++){
+								double truX = ((nameX+offsetX-(imageSizeX/2.0))/(200.0*zoom))+centerX;
+								double truY = ((nameY+offsetY-(imageSizeY/2.0))/(200.0*zoom))+centerY;
+								double sum = 0;
+								for(int i=0; i<length; i++){
+									if(m[i]!=0){
+										sum+=m[i]/Math.sqrt((truX-x[i])*(truX-x[i])+(truY-y[i])*(truY-y[i]));
+									}
+								}
+								int intensity = (int)(6*sum/100);  // sum/100
+		    					intensity = intensity%colorMap.size();
+		    					energyImage.setRGB(nameX+offsetX,nameY+offsetY,(int)colorMap.get(intensity));
+							}
 						}
 					}
-				}
-			}
+				};
+			    CalculationThreads[pxlX][pxlY].setName(String.format("%04d",pxlX*threadRes)+String.format("%04d",pxlY*threadRes));
+    			CalculationThreads[pxlX][pxlY].start();
+    		}
 		}
-	}
-	private void fadeTrails(){
-		if (frameCount%trailLength==0){
-			int testCol = 0;
-			for(int i = 0; i<imageSizeX; i++){
-				for(int j = 0; j<imageSizeY; j++){
-					testCol = trailImage.getRGB(i,j);
-					if (testCol!= -16777216){
-						int R = (testCol & 255)-1, G = ((testCol >> 8) & 255)-1, B = ((testCol >> 16) & 255)-1, A = ((testCol >> 24) & 255);
-						R=Math.max(0,R);
-						G=Math.max(0,G);
-						B=Math.max(0,B);
-						Color c = new Color(B, G, R, A);
-						trailImage.setRGB(i, j, c.getRGB());
-					}
+		for(int pxlX=0; pxlX<CalculationThreads.length; pxlX+=1){
+    		for(int pxlY=0; pxlY<CalculationThreads[pxlX].length; pxlY+=1){
+    			try{
+					CalculationThreads[pxlX][pxlY].join();
 				}
-			}
-		}
-	}
-	private void drawTrails(){
-		for(int i = 0; i<length; i++){
-			if (x[i]<10000){
-				if (m[i]>(minMass)){
-					trailGraphics.setColor(colors[i]);
-					trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
-					if (m[i]>(2*minMass)){
-						trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2)+1,(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2)+1,(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
-						trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2)-1,(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)-1));
-						trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2)-1,(((y[i]-centerY)*200*zoom)+imageSizeY/2),(((xOld[i]-centerX)*200*zoom)+imageSizeX/2)-1,(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)));
-						trailGraphics.draw (new Line2D.Double((((x[i]-centerX)*200*zoom)+imageSizeX/2),(((y[i]-centerY)*200*zoom)+imageSizeY/2)+1,(((xOld[i]-centerX)*200*zoom)+imageSizeX/2),(((yOld[i]-centerY)*200*zoom)+imageSizeY/2)+1));
-					}
-				}
-			}
+		    	catch (InterruptedException e){
+		    		e.printStackTrace();
+		    	}
+    		}
 		}
 	}
 	private void saveImage(){
@@ -233,8 +223,7 @@ public class Render {
 			}
 			BufferedImage outputImage = new BufferedImage(imageSizeX, imageSizeY, BufferedImage.TYPE_INT_ARGB );
 			Graphics2D outputGraphics = outputImage.createGraphics();
-			outputGraphics.drawImage(trailImage, 0, 0, null);
-			outputGraphics.drawImage(particleImage, 0, 0, null);
+			outputGraphics.drawImage(energyImage, 0, 0, null);
 	        ImageSaver = new Thread(){
 	    		public void run(){
 					File f = null;
@@ -251,7 +240,7 @@ public class Render {
 	    	ImageSaver.start();
 	    	picCount++;
 	    	saveOn+=incrementer;
-	    	incrementer+=0.0000;
+	    	incrementer+=0.0000; //0.0025;
 	    	elapsedTime=System.nanoTime()-startTime;
 		    System.out.println("Image "+picCount+" (Frame " + frameCount + ") saved (took " + String.format("%014d", elapsedTime) + " nanoseconds)");
 		}
@@ -292,6 +281,26 @@ public class Render {
         }
         input = new BufferedReader(inputFW);
 
+	}
+	
+	private void generateColorMap(){
+		colorMap = new ArrayList<Integer>();
+		colorMap.clear();
+//		for (int i = 255; i>=0; i--){
+//			colorMap.add(new Color(i,i,i).getRGB());
+//		}
+		
+		int[] GRB = {0,255,0};
+		int delta = 1;
+		for(int loop=0; loop<2;loop++){
+			for(int GRBi=0; GRBi<3; GRBi++){
+				for(int i=0; i<255; i++){
+					GRB[GRBi]+=delta;
+					colorMap.add(new Color(GRB[1],GRB[0],GRB[2]).getRGB());
+				}
+				delta*=-1;
+			}
+		}
 	}
     
 }
